@@ -6,9 +6,13 @@
 
 using std::weak_ptr;
 using std::unique_ptr;
+using std::shared_ptr;
 using std::map;
 using std::vector;
 using std::string;
+using std::make_shared;
+using std::move;
+using std::pair;
 
 class IVertex;
 class IEdge;
@@ -31,6 +35,7 @@ class IVertex
 public:
 	virtual VertexId getId() = 0;
 	virtual void addEdge(EdgePtr ptr) = 0;
+	virtual vector<EdgeId> getEdges() = 0;
 	//virtual void deleteEdge(EdgeId edgeId) = 0;
 };
 
