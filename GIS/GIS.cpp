@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <boost\program_options.hpp>
 #include <boost\filesystem.hpp>
 
@@ -97,33 +98,49 @@ int main(int argc, char* argv[])
 
 	Matrix weight_matrix{};
 	Matrix coords_matrix{};
+	GraphPtr main_graph{new Graph()};
 
 	if (graph_ifstream.is_open() && coords_ifstream.is_open())
 	{
 		readMatrix(graph_ifstream, weight_matrix);
 		readMatrix(coords_ifstream, coords_matrix);
 
-		GraphPtr main_graph{new Graph()};
+		
 		vector<VertexId> vertex_ids;
 		vector<EdgeId> edge_ids;
 
-		for (int i = 0; i < weight_matrix.size(); ++i)
+		for (unsigned i = 0; i < weight_matrix.size(); ++i)
 		{
 			vertex_ids.push_back(main_graph->addVertex());
 		}
 
-		for (int i = 0; i < weight_matrix.size(); ++i)
+		for (unsigned i = 0; i < weight_matrix.size(); ++i)
 		{
-			for (int j = 0; j < weight_matrix.size(); ++j)
+			for (unsigned j = 0; j < weight_matrix.size(); ++j)
 			{
-				main_graph->addEdge(vertex_ids[i], vertex_ids[j], weight_matrix[i][j]);
+				if (weight_matrix[i][j] == 0L)
+				{
+					continue;
+				}
+				else
+				{
+					main_graph->addEdge(vertex_ids[i], vertex_ids[j], weight_matrix[i][j]);
+				}
 			}
 		}
+
+
 	}
 	else
 	{
 		return 3;
 	}
+
+	main_graph->printVertices(std::cout);
+	main_graph->printEdges(std::cout);
+
+	graph_ifstream.close();
+	coords_ifstream.close();
 
     return 0;
 }

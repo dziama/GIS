@@ -20,6 +20,10 @@ public:
 	virtual EdgePtr getEdge(EdgeId edgeId) override;
 
 	virtual void getMinimumSpanningTree(GraphPtr& ptr) override;
+
+	virtual void printEdges(ostream& stream) override;
+	virtual void printVertices(ostream& stream) override;
+
 private:
 
 	Vertices m_Vertices;

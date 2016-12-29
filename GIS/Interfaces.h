@@ -13,6 +13,9 @@ using std::string;
 using std::make_shared;
 using std::move;
 using std::pair;
+using std::ostream;
+using std::endl;
+
 
 class IVertex;
 class IEdge;
@@ -90,4 +93,7 @@ public:
 	virtual EdgePtr getEdge(EdgeId edgeId) = 0;
 
 	virtual void getMinimumSpanningTree(GraphPtr& ptr) = 0;
+
+	virtual void printEdges(ostream& stream) = 0;
+	virtual void printVertices(ostream& stream) = 0;
 };

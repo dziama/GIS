@@ -6,12 +6,12 @@ Vertex::Vertex(VertexId id) : m_Id{id}
 
 VertexId Vertex::getId()
 {
-	return 0L;
+	return m_Id;
 }
 
 void Vertex::addEdge(EdgePtr ptr)
 {
-	return 0L;
+	m_Edges.push_back(ptr);
 }
 
 vector<EdgeId> Vertex::getEdges()
