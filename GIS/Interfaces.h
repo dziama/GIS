@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <array>
 
 using std::weak_ptr;
 using std::unique_ptr;
@@ -15,12 +16,13 @@ using std::move;
 using std::pair;
 using std::ostream;
 using std::endl;
+using std::array;
 
 
 class IVertex;
 class IEdge;
 class IGraph;
-class IGraphNode;
+class IHeapNode;
 
 typedef long VertexId;
 typedef long EdgeId;
@@ -31,7 +33,7 @@ typedef int NodeDegree;
 typedef weak_ptr<IVertex> VertexPtr;
 typedef unique_ptr<IGraph> GraphPtr;
 typedef weak_ptr<IEdge> EdgePtr;
-typedef weak_ptr<IGraphNode> GraphNodePtr;
+typedef weak_ptr<IHeapNode> HeapNodePtr;
 
 class IVertex
 {
@@ -57,23 +59,23 @@ public:
 	virtual VertexPtr getSecondVertex() = 0;
 };
 
-class IGraphNode
+class IHeapNode
 {
 public:
-	virtual GraphNodePtr getParent() = 0;
-	virtual void setParent(GraphNodePtr ptr) = 0;
+	virtual HeapNodePtr getParent() = 0;
+	virtual void setParent(HeapNodePtr ptr) = 0;
 
-	virtual GraphNodePtr getChild() = 0;
-	virtual void setChild(GraphNodePtr ptr) = 0;
+	virtual HeapNodePtr getChild() = 0;
+	virtual void setChild(HeapNodePtr ptr) = 0;
 
 	virtual NodeDegree getDegree() = 0;
 	virtual void setDegree(NodeDegree degree) = 0;
 
-	virtual void setNext(GraphNodePtr ptr) = 0;
-	virtual GraphNodePtr getNext() = 0;
+	virtual void setNext(HeapNodePtr ptr) = 0;
+	virtual HeapNodePtr getNext() = 0;
 
-	virtual void setPrev(GraphNodePtr ptr) = 0;
-	virtual GraphNodePtr getPrev() = 0;
+	virtual void setPrev(HeapNodePtr ptr) = 0;
+	virtual HeapNodePtr getPrev() = 0;
 
 	virtual VertexPtr getVertex() = 0;
 	virtual bool isMarked() = 0;
@@ -81,6 +83,8 @@ public:
 
 	virtual bool hasChild() = 0;
 	virtual bool hasParent() = 0;
+
+	virtual EdgeWeight getPriority() = 0;
 };
 
 class IGraph
