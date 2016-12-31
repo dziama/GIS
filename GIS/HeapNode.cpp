@@ -80,12 +80,12 @@ HeapNode::HeapNode(VertexPtr ptr, EdgeWeight priority, NodeId num) :
 
  bool HeapNode::hasChild()
  {
-	 return m_Child.lock() == nullptr;
+	 return m_Child.lock() != nullptr;
  }
  
  bool HeapNode::hasParent()
  {
-	 return m_Parent.lock() == nullptr;
+	 return m_Parent.lock() != nullptr;
  }
 
  EdgeWeight HeapNode::getPriority()

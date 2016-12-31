@@ -56,18 +56,30 @@ void testRootList(GraphPtr& graph)
 
 	auto& vertices = graph->getVertices();
 
-	double fake_weight = 10;
+	double fake_weight = 256;
 	for (auto& vert : vertices)
 	{
-		(fake_weight > 12) ? fake_weight = (fake_weight - 5) / (fake_weight + 2) : fake_weight = (fake_weight + 4) / (fake_weight - 1);
+		(fake_weight > 512) ? fake_weight -= 128 : fake_weight += 196;
 		heap.insert(vert.second, (long)fake_weight);
 		heap.printRootList(std::cout);
 		std::cout << "---------------------------------------------------" << endl;
 	}
 
 	std::cout << "-----------------END-------------------------------" << endl;
+	//heap.printRootList(std::cout);
+	//std::cout << "---------------------------------------------------" << endl;
+
+	auto vert_ptr = heap.extractMin();
 	heap.printRootList(std::cout);
-	std::cout << "---------------------------------------------------" << endl;
+	vert_ptr = heap.extractMin();
+	heap.printRootList(std::cout);
+	vert_ptr = heap.extractMin();
+	heap.printRootList(std::cout);
+	vert_ptr = heap.extractMin();
+	heap.printRootList(std::cout);
+	vert_ptr = heap.extractMin();
+	std::cout << "-----------------EMPTY HEAP-------------------------------" << endl;
+	heap.printRootList(std::cout);
 }
 
 int main(int argc, char* argv[])

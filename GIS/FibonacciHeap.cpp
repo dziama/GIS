@@ -126,6 +126,11 @@ VertexPtr FibonacciHeap::removeMinFromRootList()
 			last_child->setNext(min_next);
 		}
 	}
+	else
+	{
+		min_prev->setNext(min_next);
+		min_next->setPrev(min_prev);
+	}
 
 	if (min_ptr->getNext().lock() == min_ptr)
 	{
