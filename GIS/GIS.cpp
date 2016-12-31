@@ -1,9 +1,7 @@
 #include "Interfaces.h"
 #include "Graph.h"
+#include "FibonacciHeap.h"
 
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <boost\program_options.hpp>
 #include <boost\filesystem.hpp>
 
@@ -50,6 +48,26 @@ void readMatrix(ifstream& file, Matrix& mat)
 			//throw exe, matrix size incorrect
 		}
 	}
+}
+
+void testRootList(GraphPtr& graph)
+{
+	FibonacciHeap heap{};
+
+	auto& vertices = graph->getVertices();
+
+	double fake_weight = 10;
+	for (auto& vert : vertices)
+	{
+		(fake_weight > 12) ? fake_weight = (fake_weight - 5) / (fake_weight + 2) : fake_weight = (fake_weight + 4) / (fake_weight - 1);
+		heap.insert(vert.second, (long)fake_weight);
+		heap.printRootList(std::cout);
+		std::cout << "---------------------------------------------------" << endl;
+	}
+
+	std::cout << "-----------------END-------------------------------" << endl;
+	heap.printRootList(std::cout);
+	std::cout << "---------------------------------------------------" << endl;
 }
 
 int main(int argc, char* argv[])
@@ -128,16 +146,16 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
-
-
 	}
 	else
 	{
 		return 3;
 	}
 
-	main_graph->printVertices(std::cout);
-	main_graph->printEdges(std::cout);
+	testRootList(main_graph);
+
+	//main_graph->printVertices(std::cout);
+	//main_graph->printEdges(std::cout);
 
 	graph_ifstream.close();
 	coords_ifstream.close();

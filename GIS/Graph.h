@@ -3,11 +3,6 @@
 #include "Vertex.h"
 #include "Edge.h"
 
-typedef shared_ptr<IVertex> GraphVertexPtr;
-typedef shared_ptr<IEdge> GraphEdgePtr;
-typedef map<VertexId, GraphVertexPtr> Vertices;
-typedef map<EdgeId, GraphEdgePtr> Edges;
-
 class Graph : public IGraph
 {
 public:
@@ -23,6 +18,9 @@ public:
 
 	virtual void printEdges(ostream& stream) override;
 	virtual void printVertices(ostream& stream) override;
+
+	Vertices getVertices() override;
+	Edges getEdges() override;
 
 private:
 

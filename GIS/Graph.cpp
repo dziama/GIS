@@ -116,3 +116,13 @@ void Graph::printVertices(ostream& stream)
 		stream << endl;
 	}
 }
+
+Vertices Graph::getVertices()
+{
+	return m_Vertices;
+}
+
+Edges Graph::getEdges()
+{
+	return m_Edges;
+}

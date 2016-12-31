@@ -4,6 +4,9 @@
 #include <map>
 #include <string>
 #include <array>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 using std::weak_ptr;
 using std::unique_ptr;
@@ -28,12 +31,18 @@ typedef long VertexId;
 typedef long EdgeId;
 typedef long VertexPriority;
 typedef long EdgeWeight;
-typedef int NodeDegree;
+typedef unsigned NodeDegree;
+typedef long NodeId;
 
 typedef weak_ptr<IVertex> VertexPtr;
 typedef unique_ptr<IGraph> GraphPtr;
 typedef weak_ptr<IEdge> EdgePtr;
 typedef weak_ptr<IHeapNode> HeapNodePtr;
+
+typedef shared_ptr<IVertex> GraphVertexPtr;
+typedef shared_ptr<IEdge> GraphEdgePtr;
+typedef map<VertexId, GraphVertexPtr> Vertices;
+typedef map<EdgeId, GraphEdgePtr> Edges;
 
 class IVertex
 {
@@ -84,6 +93,8 @@ public:
 	virtual bool hasChild() = 0;
 	virtual bool hasParent() = 0;
 
+	virtual NodeId getNodeNumber() = 0;
+
 	virtual EdgeWeight getPriority() = 0;
 };
 
@@ -100,4 +111,7 @@ public:
 
 	virtual void printEdges(ostream& stream) = 0;
 	virtual void printVertices(ostream& stream) = 0;
+
+	virtual Vertices getVertices() = 0;
+	virtual Edges getEdges() = 0;
 };
