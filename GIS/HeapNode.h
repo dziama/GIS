@@ -11,7 +11,8 @@ public:
 	virtual void setChild(HeapNodePtr ptr) override;
 
 	virtual NodeDegree getDegree() override;
-	virtual void setDegree(NodeDegree degree) override;
+	//virtual void setDegree(NodeDegree degree) override;
+	virtual void increaseDegree(NodeDegree increase) override;
 
 	virtual void setNext(HeapNodePtr ptr) override;
 	virtual HeapNodePtr getNext() override;
@@ -22,6 +23,7 @@ public:
 	virtual VertexPtr getVertex() override;
 	virtual bool isMarked() override;
 	virtual void mark() override;
+	virtual void unmark() override;
 
 	virtual bool hasChild() override;
 	virtual bool hasParent() override;
@@ -43,7 +45,6 @@ private:
 	VertexPtr m_Vertex;
 
 	NodeId m_NodeNumber;
-
 
 	bool m_Marked;
 

@@ -7,6 +7,7 @@ class Graph : public IGraph
 {
 public:
 	Graph();
+	~Graph();
 
 	virtual VertexId addVertex() override;
 	virtual EdgeId addEdge(VertexId vertexId1, VertexId vertexId2, EdgeWeight weight) override;

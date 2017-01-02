@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <cmath>
+#include <exception>
 
 using std::weak_ptr;
 using std::unique_ptr;
@@ -20,7 +22,10 @@ using std::pair;
 using std::ostream;
 using std::endl;
 using std::array;
-
+using std::exception;
+using std::stringstream;
+using std::ifstream;
+using std::getline;
 
 class IVertex;
 class IEdge;
@@ -33,6 +38,9 @@ typedef long VertexPriority;
 typedef long EdgeWeight;
 typedef unsigned NodeDegree;
 typedef long NodeId;
+typedef long RootNodeCounter;
+
+typedef vector<vector<EdgeWeight>> Matrix;
 
 typedef weak_ptr<IVertex> VertexPtr;
 typedef unique_ptr<IGraph> GraphPtr;
@@ -43,6 +51,10 @@ typedef shared_ptr<IVertex> GraphVertexPtr;
 typedef shared_ptr<IEdge> GraphEdgePtr;
 typedef map<VertexId, GraphVertexPtr> Vertices;
 typedef map<EdgeId, GraphEdgePtr> Edges;
+
+typedef shared_ptr<IHeapNode> NodePtr;
+typedef pair<VertexId, NodePtr> HeapPair;
+typedef map<VertexId, NodePtr> HeapNodes;
 
 class IVertex
 {
@@ -78,7 +90,8 @@ public:
 	virtual void setChild(HeapNodePtr ptr) = 0;
 
 	virtual NodeDegree getDegree() = 0;
-	virtual void setDegree(NodeDegree degree) = 0;
+	//virtual void setDegree(NodeDegree degree) = 0;
+	virtual void increaseDegree(NodeDegree increase) = 0;
 
 	virtual void setNext(HeapNodePtr ptr) = 0;
 	virtual HeapNodePtr getNext() = 0;
@@ -89,6 +102,7 @@ public:
 	virtual VertexPtr getVertex() = 0;
 	virtual bool isMarked() = 0;
 	virtual void mark() = 0;
+	virtual void unmark() = 0;
 
 	virtual bool hasChild() = 0;
 	virtual bool hasParent() = 0;

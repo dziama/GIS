@@ -4,19 +4,18 @@
 #include "Vertex.h"
 #include "HeapNode.h"
 
-typedef shared_ptr<IHeapNode> NodePtr;
-typedef pair<VertexId, NodePtr> HeapPair;
-typedef map<VertexId, NodePtr> HeapNodes;
-
 class FibonacciHeap
 {
+	friend class FibbonacciHeapTestClass;
+
 public:
 	FibonacciHeap();
 	~FibonacciHeap();
 
 	void insert(VertexPtr ptr, EdgeWeight weight);
-	VertexPtr extractMin();
-	void printRootList(ostream& stream);
+	NodePtr extractMin();
+	void printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose = false);
+	HeapNodePtr peekMinElement();
 
 	size_t getSize();
 
@@ -33,13 +32,15 @@ private:
 	//void deleteNodes(HeapNodePtr node);
 	//void merge(HeapNodePtr a, HeapNodePtr b);
 	//void findInHeap();
-	void heapLink();
+	void heapLink(NodePtr& toChild, NodePtr& toParent);
 	void consolidate();
 	bool isEmpty();
 
 	bool pointerEmpty(const HeapNodePtr& ptr);
 
-	void insertIntoRootList(NodePtr node);
-	VertexPtr removeMinFromRootList();
+	void insertIntoRootList(NodePtr& node);
+	void removeFromRootList(NodePtr& ptr);
+	NodePtr removeMinFromRootList();
+
 };
 

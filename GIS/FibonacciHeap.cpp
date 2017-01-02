@@ -7,18 +7,23 @@ FibonacciHeap::FibonacciHeap() : m_NextFreeNodeNumber{0L}
 
 FibonacciHeap::~FibonacciHeap()
 {
+	m_MinElement.lock() = nullptr;
+	m_HeapNodes.clear();
 }
 
 void FibonacciHeap::insert(VertexPtr ptr, EdgeWeight weight)
 {
 	//1,2,3,4,5,6,7
-	NodePtr new_node{new HeapNode{ptr, weight, m_NextFreeNodeNumber++}}; 
+	NodePtr new_node{new HeapNode{ptr, weight, m_NextFreeNodeNumber++}};
+	m_HeapNodes.insert(HeapPair(ptr.lock()->getId(), new_node));
+	new_node = m_HeapNodes[ptr.lock()->getId()];
+
 	new_node->setNext(new_node);
 	new_node->setPrev(new_node);
 
 	//9
 	insertIntoRootList(new_node);
-	m_HeapNodes.insert(HeapPair(ptr.lock()->getId(), new_node));
+	
 }
 
 bool FibonacciHeap::isEmpty()
@@ -38,31 +43,124 @@ bool FibonacciHeap::pointerEmpty(const HeapNodePtr& ptr)
 	}
 }
 
-VertexPtr FibonacciHeap::extractMin()
+NodePtr FibonacciHeap::extractMin()
 {
-	VertexPtr ptr;
+	NodePtr ptr;
 	if (pointerEmpty(m_MinElement) == false)
 	{
 		ptr = removeMinFromRootList();
-		m_HeapNodes.erase(ptr.lock()->getId());
+		m_HeapNodes.erase(ptr->getVertex().lock()->getId());
 	}
 	return ptr;
 }
 
-void FibonacciHeap::heapLink()
+void FibonacciHeap::removeFromRootList(NodePtr& ptr)
 {
-	//unique_ptr<HeapNodePtr> support_array{new HeapNodePtr[m_NodesCounter]};
+	auto next = ptr->getNext().lock();
+	auto prev = ptr->getPrev().lock();
 
+	next->setPrev(prev);
+	prev->setNext(next);
+
+	ptr->setNext(ptr);
+	ptr->setPrev(ptr);
+}
+
+void FibonacciHeap::heapLink(NodePtr& toChild, NodePtr& toParent)
+{
+	removeFromRootList(toChild);
+
+	if (toParent->hasChild())
+	{
+		auto child = toParent->getChild().lock();
+		auto child_prev = child->getPrev().lock();
+
+		toChild->setNext(child);
+		child->setPrev(toChild);
+
+		toChild->setPrev(child_prev);
+		child_prev->setNext(toChild);
+	}
+	else
+	{
+		toChild->setNext(toChild);
+		toChild->setPrev(toChild);
+	}
+
+	toParent->increaseDegree(1);
+	toParent->setChild(toChild);
+	toChild->setParent(toParent);
+	toChild->unmark();
 }
 
 void FibonacciHeap::consolidate()
 {
+	unsigned aux_table_size = (unsigned)ceil(log(m_HeapNodes.size())) + 1;
+	vector<NodePtr> aux_table;
+	aux_table.reserve(aux_table_size);
 
+	for (unsigned i = 0; i < aux_table_size; ++i)
+	{
+		aux_table.push_back(nullptr);
+	}
+
+	auto current_node = m_MinElement.lock();
+	auto next_node = current_node;
+	NodeDegree degree = current_node->getDegree();
+
+	do
+	{
+		next_node = current_node->getNext().lock();
+		removeFromRootList(current_node);
+
+		while (aux_table[degree] != nullptr)
+		{
+			auto second_node = aux_table[degree];
+			if (current_node->getPriority() > second_node->getPriority())
+			{
+				heapLink(current_node, second_node);
+			}
+			else
+			{
+				heapLink(second_node, current_node);
+			}
+			aux_table[degree] = nullptr;
+			++degree;
+
+			if (degree >= aux_table_size)
+			{
+				break;
+			}
+		}
+
+		if (degree >= aux_table_size)
+		{
+			break;
+		}
+		aux_table[degree] = current_node;
+		m_MinElement.lock().reset();
+
+		current_node = next_node;
+
+	} while (current_node->getNext().lock() == current_node);
+
+	for (unsigned itr = 0; itr < aux_table.size(); ++itr)
+	{
+		if (aux_table[itr] != nullptr)
+		{
+			auto min_element = m_MinElement.lock();
+			insertIntoRootList(aux_table[itr]);
+			if (min_element == nullptr || aux_table[itr]->getPriority() < min_element->getPriority())
+			{
+				m_MinElement = aux_table[itr];
+			}
+		}
+	}
 }
 
-void FibonacciHeap::insertIntoRootList(NodePtr node)
+void FibonacciHeap::insertIntoRootList(NodePtr& node)
 {
-	if (isEmpty() == false)
+	if (m_MinElement.lock() != nullptr)
 	{
 		auto min_element = m_MinElement.lock();
 		auto min_prev = min_element->getPrev().lock();
@@ -84,12 +182,13 @@ void FibonacciHeap::insertIntoRootList(NodePtr node)
 	}
 }
 
-VertexPtr FibonacciHeap::removeMinFromRootList()
+NodePtr FibonacciHeap::removeMinFromRootList()
 {
-	VertexPtr ptr;
+	NodePtr ptr;
+	//VertexPtr ptr;
 	//get lowest priority element
 	auto min_ptr = m_MinElement.lock();
-	ptr = min_ptr->getVertex();
+	ptr = min_ptr;
 
 	//get its next and prev elemnet pointers, will be needed
 	auto min_next = min_ptr->getNext().lock();
@@ -99,16 +198,10 @@ VertexPtr FibonacciHeap::removeMinFromRootList()
 	{
 		NodeDegree degree = min_ptr->getDegree();
 		NodePtr first_child = min_ptr->getChild().lock();
-		NodePtr last_child = first_child;
+		NodePtr last_child = first_child->getPrev().lock();
 
 		first_child->setParent(HeapNodePtr{});
 
-		while (pointerEmpty(last_child->getNext()) == false)
-		{
-			last_child = last_child->getNext().lock();
-			last_child->setParent(HeapNodePtr{});
-		}
-		
 		if (first_child == last_child)
 		{
 			min_prev->setNext(first_child);
@@ -119,6 +212,12 @@ VertexPtr FibonacciHeap::removeMinFromRootList()
 		}
 		else
 		{
+			auto current = first_child;
+			while (current != last_child)
+			{
+				current->setParent(HeapNodePtr{});
+			}
+
 			min_prev->setNext(first_child);
 			first_child->setPrev(min_prev);
 
@@ -145,35 +244,54 @@ VertexPtr FibonacciHeap::removeMinFromRootList()
 	return ptr;
 }
 
-void FibonacciHeap::printRootList(ostream& stream)
+void FibonacciHeap::printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose)
 {
-	NodePtr current = m_MinElement.lock();
+	NodePtr begin = ptr.lock();
+	NodePtr current = begin;
+
 	auto size = getSize();
-
-	std::cout << "-----------------------FORWARD----------------------------" << endl;
-	for (unsigned cnt = 0; cnt < size; ++cnt)
+	if (verbose)
 	{
-		stream << " Node: " << current->getNodeNumber()
+		std::cout << "-----------------------FORWARD----------------------------" << endl;
+		do
+		{
+			stream << " Node: " << current->getNodeNumber()
 			<< " Priority: " << current->getPriority()
 			<< " Degree: " << current->getDegree()
 			<< " Children: " << current->hasChild() << endl;
-		current = current->getNext().lock();
+			current = current->getNext().lock();
+		} while (current != begin);
+
+		current = begin;
+
+		std::cout << "-----------------------REVERSE----------------------------" << endl;
+		do
+		{
+			stream << " Node: " << current->getNodeNumber()
+				<< " Priority: " << current->getPriority()
+				<< " Degree: " << current->getDegree()
+				<< " Children: " << current->hasChild() << endl;
+			current = current->getPrev().lock();
+		} while (current != begin);
 	}
-
-	current = m_MinElement.lock();
-
-	std::cout << "-----------------------REVERSE----------------------------" << endl;
-	for (unsigned cnt = 0; cnt < size; ++cnt)
+	else
 	{
-		stream << " Node: " << current->getNodeNumber()
-			<< " Priority: " << current->getPriority()
-			<< " Degree: " << current->getDegree()
-			<< " Children: " << current->hasChild() << endl;
-		current = current->getPrev().lock();
+		do
+		{
+			stream << " Node: " << current->getPriority() << "  ";
+			current = current->getNext().lock();
+		} while (current != begin);
+		stream << endl;
 	}
+	
 }
 
 size_t FibonacciHeap::getSize()
 {
 	return m_HeapNodes.size();
+}
+
+HeapNodePtr FibonacciHeap::peekMinElement()
+{
+	return m_MinElement;
 }

@@ -6,6 +6,12 @@ Graph::Graph()
 	m_NextEdgeId = 1;
 }
 
+Graph::~Graph()
+{
+	m_Vertices.clear();
+	m_Edges.clear();
+}
+
 VertexId Graph::addVertex()
 {
 	VertexId used_id = m_NextVertexId++;
@@ -74,12 +80,12 @@ EdgeId Graph::addEdge(VertexId vertexId1, VertexId vertexId2, EdgeWeight weight)
 
 VertexPtr Graph::getVertex(VertexId vertexId)
 {
-	return VertexPtr();
+	return m_Vertices[vertexId];
 }
 
 EdgePtr Graph::getEdge(EdgeId edgeId)
 {
-	return EdgePtr();
+	return m_Edges[edgeId];
 }
 
 void Graph::getMinimumSpanningTree(GraphPtr& ptr)

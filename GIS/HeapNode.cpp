@@ -38,9 +38,14 @@ HeapNode::HeapNode(VertexPtr ptr, EdgeWeight priority, NodeId num) :
 	 return m_Degree;
  }
  
- void HeapNode::setDegree(NodeDegree degree)
+ //void HeapNode::setDegree(NodeDegree degree)
+ //{
+//	 m_Degree = degree;
+ //}
+
+ void HeapNode::increaseDegree(NodeDegree increase)
  {
-	 m_Degree = degree;
+	 m_Degree += increase;
  }
 
  void HeapNode::setNext(HeapNodePtr ptr)
@@ -70,12 +75,20 @@ HeapNode::HeapNode(VertexPtr ptr, EdgeWeight priority, NodeId num) :
  
  bool HeapNode::isMarked()
  {
-	 return false;
+	 return m_Marked;
  }
  
  void HeapNode::mark()
  {
 	 m_Marked = true;
+ }
+
+ void HeapNode::unmark()
+ {
+	 if (m_Marked)
+	 {
+		m_Marked = false;
+	 }
  }
 
  bool HeapNode::hasChild()
