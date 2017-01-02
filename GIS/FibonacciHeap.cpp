@@ -46,7 +46,7 @@ bool FibonacciHeap::pointerEmpty(const HeapNodePtr& ptr)
 NodePtr FibonacciHeap::extractMin()
 {
 	NodePtr ptr;
-	if (pointerEmpty(m_MinElement) == false)
+	if (m_MinElement.lock() != nullptr)
 	{
 		ptr = removeMinFromRootList();
 		m_HeapNodes.erase(ptr->getVertex().lock()->getId());
@@ -93,66 +93,78 @@ void FibonacciHeap::heapLink(NodePtr& toChild, NodePtr& toParent)
 	toChild->unmark();
 }
 
-void FibonacciHeap::consolidate()
+void FibonacciHeap::consolidate(NodePtr begin)
 {
-	unsigned aux_table_size = (unsigned)ceil(log(m_HeapNodes.size())) + 1;
 	vector<NodePtr> aux_table;
-	aux_table.reserve(aux_table_size);
-
-	for (unsigned i = 0; i < aux_table_size; ++i)
-	{
-		aux_table.push_back(nullptr);
-	}
-
-	auto current_node = m_MinElement.lock();
-	auto next_node = current_node;
-	NodeDegree degree = current_node->getDegree();
-
+	vector<NodePtr> nodes_to_visit;
+	
+	auto current_node = begin;
 	do
 	{
-		next_node = current_node->getNext().lock();
-		removeFromRootList(current_node);
+		nodes_to_visit.push_back(current_node);
+		current_node = current_node->getNext().lock();
+	} while (current_node != begin);
 
-		while (aux_table[degree] != nullptr)
+	NodeDegree degree = 0;
+
+	auto& auxTableSentry = [&aux_table](NodeDegree d) -> bool
+	{
+		if (aux_table.size() == 0)
 		{
-			auto second_node = aux_table[degree];
-			if (current_node->getPriority() > second_node->getPriority())
+			aux_table.push_back(nullptr);
+		}
+
+		if(aux_table.size() - 1 < d)
+		{
+			auto diff = d - aux_table.size() + 1;
+			for (unsigned i = 0; i < diff; ++i)
 			{
-				heapLink(current_node, second_node);
+				aux_table.push_back(nullptr);
 			}
-			else
+		}
+
+		if (aux_table[d] == nullptr)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	};
+
+	for (auto& visted_node : nodes_to_visit)
+	{
+		degree = visted_node->getDegree();
+		while (auxTableSentry(degree))
+		{
+			auto y = aux_table[degree];
+			if (visted_node->getPriority() > y->getPriority())
 			{
-				heapLink(second_node, current_node);
+				visted_node.swap(y);
 			}
+
+			heapLink(y, visted_node);
+			
 			aux_table[degree] = nullptr;
 			++degree;
-
-			if (degree >= aux_table_size)
-			{
-				break;
-			}
+			auxTableSentry(degree);
 		}
 
-		if (degree >= aux_table_size)
-		{
-			break;
-		}
-		aux_table[degree] = current_node;
-		m_MinElement.lock().reset();
+		auxTableSentry(degree);
+		aux_table[degree] = visted_node;
+	}
 
-		current_node = next_node;
+	m_MinElement = HeapNodePtr{};
 
-	} while (current_node->getNext().lock() == current_node);
-
-	for (unsigned itr = 0; itr < aux_table.size(); ++itr)
+	for (auto& node : aux_table)
 	{
-		if (aux_table[itr] != nullptr)
+		if (node != nullptr)
 		{
-			auto min_element = m_MinElement.lock();
-			insertIntoRootList(aux_table[itr]);
-			if (min_element == nullptr || aux_table[itr]->getPriority() < min_element->getPriority())
+			insertIntoRootList(node);
+			if (node->getPriority() < m_MinElement.lock()->getPriority())
 			{
-				m_MinElement = aux_table[itr];
+				m_MinElement = node;
 			}
 		}
 	}
@@ -182,64 +194,70 @@ void FibonacciHeap::insertIntoRootList(NodePtr& node)
 	}
 }
 
-NodePtr FibonacciHeap::removeMinFromRootList()
+NodePtr FibonacciHeap::moveNodeChildrenToRootList(NodePtr& node)
 {
-	NodePtr ptr;
-	//VertexPtr ptr;
-	//get lowest priority element
-	auto min_ptr = m_MinElement.lock();
-	ptr = min_ptr;
+	auto next = node->getNext().lock();
+	auto prev = node->getPrev().lock();
 
-	//get its next and prev elemnet pointers, will be needed
-	auto min_next = min_ptr->getNext().lock();
-	auto min_prev = min_ptr->getPrev().lock();
-
-	if (min_ptr->hasChild())
+	if (node->hasParent())
 	{
-		NodeDegree degree = min_ptr->getDegree();
-		NodePtr first_child = min_ptr->getChild().lock();
-		NodePtr last_child = first_child->getPrev().lock();
+		throw exception{ "Node to be extracted cannot have parent!" };
+	}
 
-		first_child->setParent(HeapNodePtr{});
-
-		if (first_child == last_child)
+	if (node->hasChild())
+	{
+		if (node->getDegree() == 1)
 		{
-			min_prev->setNext(first_child);
-			first_child->setPrev(min_prev);
+			NodePtr child = node->getChild().lock();
 
-			min_next->setPrev(first_child);
-			first_child->setNext(min_next);
+			child->setParent(HeapNodePtr{});
+			child->setNext(next);
+			child->setPrev(prev);
+
+			next->setPrev(child);
+			prev->setNext(child);
 		}
 		else
 		{
-			auto current = first_child;
-			while (current != last_child)
+			NodePtr first_child = node->getChild().lock();
+			NodePtr last_child = first_child->getPrev().lock();
+
+			prev->setNext(first_child);
+			first_child->setPrev(prev);
+
+			next->setPrev(last_child);
+			last_child->setNext(next);
+
+			auto current_child = first_child;
+			do
 			{
-				current->setParent(HeapNodePtr{});
-			}
-
-			min_prev->setNext(first_child);
-			first_child->setPrev(min_prev);
-
-			min_next->setPrev(last_child);
-			last_child->setNext(min_next);
+				current_child->setParent(HeapNodePtr{});
+				current_child = current_child->getNext().lock();
+			} while (current_child != last_child);
 		}
 	}
 	else
 	{
-		min_prev->setNext(min_next);
-		min_next->setPrev(min_prev);
+		next->setPrev(prev);
+		prev->setNext(next);
 	}
 
-	if (min_ptr->getNext().lock() == min_ptr)
-	{
-		m_MinElement = HeapNodePtr{};
-	}
-	else
-	{
-		m_MinElement = min_ptr->getNext();
-		consolidate();
-	}
+	node->setChild(HeapNodePtr{});
+
+	m_MinElement = prev;
+
+	return next;
+}
+
+NodePtr FibonacciHeap::removeMinFromRootList()
+{
+	NodePtr ptr;
+	auto min_ptr = m_MinElement.lock();
+	ptr = min_ptr;
+
+	auto node = moveNodeChildrenToRootList(min_ptr);
+
+	consolidate(node);
 
 	return ptr;
 }

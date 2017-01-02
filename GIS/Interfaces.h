@@ -35,7 +35,7 @@ class IHeapNode;
 typedef long VertexId;
 typedef long EdgeId;
 typedef long VertexPriority;
-typedef long EdgeWeight;
+typedef unsigned long EdgeWeight;
 typedef unsigned NodeDegree;
 typedef long NodeId;
 typedef long RootNodeCounter;

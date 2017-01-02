@@ -16,7 +16,7 @@ public:
 	NodePtr extractMin();
 	void printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose = false);
 	HeapNodePtr peekMinElement();
-
+	bool isEmpty();
 	size_t getSize();
 
 private:
@@ -33,14 +33,15 @@ private:
 	//void merge(HeapNodePtr a, HeapNodePtr b);
 	//void findInHeap();
 	void heapLink(NodePtr& toChild, NodePtr& toParent);
-	void consolidate();
-	bool isEmpty();
+	void consolidate(NodePtr begin);
+	
 
 	bool pointerEmpty(const HeapNodePtr& ptr);
 
 	void insertIntoRootList(NodePtr& node);
 	void removeFromRootList(NodePtr& ptr);
 	NodePtr removeMinFromRootList();
+	NodePtr moveNodeChildrenToRootList(NodePtr& node);
 
 };
 
