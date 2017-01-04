@@ -4,6 +4,10 @@
 #include "Vertex.h"
 #include "HeapNode.h"
 
+class FibonacciHeap;
+
+typedef shared_ptr<FibonacciHeap> HeapPtr;
+
 class FibonacciHeap
 {
 	friend class FibbonacciHeapTestClass;
@@ -12,7 +16,7 @@ public:
 	FibonacciHeap();
 	~FibonacciHeap();
 
-	void insert(VertexPtr ptr, EdgeWeight weight);
+	void insert(VertexPtr ptr, EdgePtr edge);
 	NodePtr extractMin();
 	void printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose = false);
 	HeapNodePtr peekMinElement();

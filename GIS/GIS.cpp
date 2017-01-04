@@ -2,6 +2,7 @@
 #include "Graph.h"
 #include "FibonacciHeap.h"
 #include "Utility.h"
+#include "HeapGui.h"
 
 #include <boost\program_options.hpp>
 #include <boost\filesystem.hpp>
@@ -17,34 +18,34 @@ string option_coords_file = "cfile";
 
 void testRootList(GraphPtr& graph)
 {
-	FibonacciHeap heap{};
+	//FibonacciHeap heap{};
 
-	auto& vertices = graph->getVertices();
+	//auto& vertices = graph->getVertices();
 
-	double fake_weight = 256;
-	for (auto& vert : vertices)
-	{
-		(fake_weight > 512) ? fake_weight -= 128 : fake_weight += 196;
-		heap.insert(vert.second, (long)fake_weight);
-		heap.printNodeList(std::cout, heap.peekMinElement());
-		std::cout << "---------------------------------------------------" << endl;
-	}
+	//double fake_weight = 256;
+	//for (auto& vert : vertices)
+	//{
+	//	(fake_weight > 512) ? fake_weight -= 128 : fake_weight += 196;
+	//	heap.insert(vert.second, (long)fake_weight);
+	//	heap.printNodeList(std::cout, heap.peekMinElement());
+	//	std::cout << "---------------------------------------------------" << endl;
+	//}
 
-	std::cout << "-----------------END-------------------------------" << endl;
-	//heap.printRootList(std::cout);
-	//std::cout << "---------------------------------------------------" << endl;
+	//std::cout << "-----------------END-------------------------------" << endl;
+	////heap.printRootList(std::cout);
+	////std::cout << "---------------------------------------------------" << endl;
 
-	auto vert_ptr = heap.extractMin();
-	heap.printNodeList(std::cout, heap.peekMinElement());
-	vert_ptr = heap.extractMin();
-	heap.printNodeList(std::cout, heap.peekMinElement());
-	vert_ptr = heap.extractMin();
-	heap.printNodeList(std::cout, heap.peekMinElement());
-	vert_ptr = heap.extractMin();
-	heap.printNodeList(std::cout, heap.peekMinElement());
-	vert_ptr = heap.extractMin();
-	std::cout << "-----------------EMPTY HEAP-------------------------------" << endl;
-	heap.printNodeList(std::cout, heap.peekMinElement());
+	//auto vert_ptr = heap.extractMin();
+	//heap.printNodeList(std::cout, heap.peekMinElement());
+	//vert_ptr = heap.extractMin();
+	//heap.printNodeList(std::cout, heap.peekMinElement());
+	//vert_ptr = heap.extractMin();
+	//heap.printNodeList(std::cout, heap.peekMinElement());
+	//vert_ptr = heap.extractMin();
+	//heap.printNodeList(std::cout, heap.peekMinElement());
+	//vert_ptr = heap.extractMin();
+	//std::cout << "-----------------EMPTY HEAP-------------------------------" << endl;
+	//heap.printNodeList(std::cout, heap.peekMinElement());
 }
 
 int main(int argc, char* argv[])
@@ -61,13 +62,13 @@ int main(int argc, char* argv[])
 
 	fs::path graph_file;
 	fs::path coords_file;
-	
+
 	if (variables.count(option_help.c_str()))
 	{
 		return 0;
 	}
 
-	if(variables.count(option_graph_file.c_str()))
+	if (variables.count(option_graph_file.c_str()))
 	{
 		graph_file = fs::path(variables[option_graph_file].as<string>());
 	}
@@ -85,8 +86,45 @@ int main(int argc, char* argv[])
 		return 2;
 	}
 
-    return 0;
+	ifstream graph_ifstream;
+
+	graph_ifstream.open(graph_file.c_str());
+
+	Matrix weight_matrix{};
+	Graph graph{};
+	HeapPtr heap;
+
+	if (graph_ifstream.is_open())
+	{
+		readMatrix(graph_ifstream, weight_matrix);
+
+		vector<VertexId> vertex_ids;
+		vector<EdgeId> edge_ids;
+
+		for (unsigned i = 0; i < weight_matrix.size(); ++i)
+		{
+			vertex_ids.push_back(graph.addVertex());
+		}
+
+		for (unsigned i = 0; i < weight_matrix.size(); ++i)
+		{
+			for (unsigned j = 0; j < weight_matrix.size(); ++j)
+			{
+				if (weight_matrix[i][j] == 0L)
+				{
+					continue;
+				}
+				else
+				{
+					graph.addEdge(vertex_ids[i], vertex_ids[j], weight_matrix[i][j]);
+				}
+			}
+		}
+
+		HeapGui gui{ heap };
+
+		
+	}
+	return 0;
 }
-
-
 

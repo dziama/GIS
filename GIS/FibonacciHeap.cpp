@@ -11,10 +11,10 @@ FibonacciHeap::~FibonacciHeap()
 	m_HeapNodes.clear();
 }
 
-void FibonacciHeap::insert(VertexPtr ptr, EdgeWeight weight)
+void FibonacciHeap::insert(VertexPtr ptr, EdgePtr edge)
 {
 	//1,2,3,4,5,6,7
-	NodePtr new_node{new HeapNode{ptr, weight, m_NextFreeNodeNumber++}};
+	NodePtr new_node{new HeapNode{ptr, edge, m_NextFreeNodeNumber++}};
 	m_HeapNodes.insert(HeapPair(ptr.lock()->getId(), new_node));
 	new_node = m_HeapNodes[ptr.lock()->getId()];
 

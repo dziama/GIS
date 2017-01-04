@@ -1,8 +1,8 @@
 #include "HeapNode.h"
 
-HeapNode::HeapNode(VertexPtr ptr, EdgeWeight priority, NodeId num) :
+HeapNode::HeapNode(VertexPtr ptr, EdgePtr edge, NodeId num) :
 	m_Vertex{ptr}, m_Degree{ 0 }, m_Next{}, m_Prev{}, 
-	m_Priority{priority}, m_Child{}, m_Parent{}, 
+	m_Edge{edge}, m_Child{}, m_Parent{}, 
 	m_Marked{false}, m_NodeNumber{num}
 {
 }
@@ -103,7 +103,7 @@ HeapNode::HeapNode(VertexPtr ptr, EdgeWeight priority, NodeId num) :
 
  EdgeWeight HeapNode::getPriority()
  {
-	 return m_Priority;
+	 return m_Edge.lock()->getWeight();
  }
 
  NodeId HeapNode::getNodeNumber()

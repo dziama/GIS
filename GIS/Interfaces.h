@@ -39,13 +39,14 @@ typedef unsigned long EdgeWeight;
 typedef unsigned NodeDegree;
 typedef long NodeId;
 typedef long RootNodeCounter;
+typedef long LinkId;
 
 typedef vector<vector<EdgeWeight>> Matrix;
 
 typedef weak_ptr<IVertex> VertexPtr;
 typedef unique_ptr<IGraph> GraphPtr;
 typedef weak_ptr<IEdge> EdgePtr;
-typedef weak_ptr<IHeapNode> HeapNodePtr;
+
 
 typedef shared_ptr<IVertex> GraphVertexPtr;
 typedef shared_ptr<IEdge> GraphEdgePtr;
@@ -53,6 +54,8 @@ typedef map<VertexId, GraphVertexPtr> Vertices;
 typedef map<EdgeId, GraphEdgePtr> Edges;
 
 typedef shared_ptr<IHeapNode> NodePtr;
+typedef weak_ptr<IHeapNode> HeapNodePtr;
+
 typedef pair<VertexId, NodePtr> HeapPair;
 typedef map<VertexId, NodePtr> HeapNodes;
 

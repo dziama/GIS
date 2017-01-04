@@ -33,7 +33,7 @@ public:
 	virtual EdgeWeight getPriority();
 
 	//HeapNode(VertexPtr ptr, EdgeWeight priority, HeapNodePtr next, HeapNodePtr prev);
-	HeapNode(VertexPtr ptr, EdgeWeight priority, NodeId num);
+	HeapNode(VertexPtr ptr, EdgePtr priority, NodeId num);
 
 private:
 
@@ -50,5 +50,5 @@ private:
 
 	NodeDegree m_Degree;
 
-	EdgeWeight m_Priority;
+	EdgePtr m_Edge;
 };
