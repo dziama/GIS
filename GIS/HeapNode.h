@@ -28,12 +28,12 @@ public:
 	virtual bool hasChild() override;
 	virtual bool hasParent() override;
 
-	virtual NodeId getNodeNumber() override;
+	virtual HeapNodeId getNodeNumber() override;
 
 	virtual EdgeWeight getPriority();
 
 	//HeapNode(VertexPtr ptr, EdgeWeight priority, HeapNodePtr next, HeapNodePtr prev);
-	HeapNode(VertexPtr ptr, EdgePtr priority, NodeId num);
+	HeapNode(VertexPtr vert, EdgePtr edge, HeapNodeId num);
 
 private:
 
@@ -44,7 +44,7 @@ private:
 
 	VertexPtr m_Vertex;
 
-	NodeId m_NodeNumber;
+	HeapNodeId m_NodeNumber;
 
 	bool m_Marked;
 

@@ -2,8 +2,8 @@
 
 Graph::Graph()
 {
-	m_NextVertexId = 1;
-	m_NextEdgeId = 1;
+	m_NextVertexId = 0;
+	m_NextEdgeId = 0;
 }
 
 Graph::~Graph()

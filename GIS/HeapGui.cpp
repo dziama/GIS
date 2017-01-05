@@ -1,6 +1,6 @@
 #include "HeapGui.h"
 
-NodeId HeapGui::m_EmptyTile{-1L};
+HeapNodeId HeapGui::m_EmptyTile{-1L};
 
 HeapGui::HeapGui(HeapPtr heap) : m_Heap{heap}
 {
@@ -27,7 +27,7 @@ void HeapGui::clearMatrix()
 	}
 }
 
-void HeapGui::writeToMatrix(NodeId val, unsigned x, unsigned y)
+void HeapGui::writeToMatrix(HeapNodeId val, unsigned x, unsigned y)
 {
 	if (m_DrawMatrix.size() == 0)
 	{
@@ -133,12 +133,13 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 	{
 		addNodeToDrawMatrix(node->getChild().lock()->getPrev().lock(), m, x, y + 2);
 		addNodeToDrawMatrix(node->getChild().lock(), m, x + 2, y + 2);
-		return 0L;
+		return 2;
 	}
 	else
 	{
 		y = y + 2;
 		long w = 0;
+		long val = 0;
 
 		vector<NodePtr> children;
 		auto first_child = node->getChild().lock();
@@ -157,15 +158,68 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 
 		for (auto& child : children)
 		{
-			w += addNodeToDrawMatrix(child, m, x, y);
-			x = xOffset(x, w);
+			val = addNodeToDrawMatrix(child, m, x, y) ;
+			if (val == 0)
+			{
+				w += 2;
+			}
+			else
+			{
+				w += val;
+			}
+			x = xOffset(x);
 		}
 
 		return w;
 	}
 }
 
-long HeapGui::xOffset(unsigned x, long w)
+long HeapGui::xOffset(unsigned x)
 {
-	return x + 2 + w;
+	return x + 2;
+}
+
+void HeapGui::drawHeap(IGraph& graph)
+{
+	auto min = m_Heap->peekMinElement().lock();
+	auto current = min;
+	vector<NodePtr> nodes;
+
+	do
+	{
+		nodes.push_back(current);
+		current = current->getNext().lock();
+	} while (current != min);
+
+	unsigned x = 1;
+	unsigned y = 1;
+	long w = 0;
+
+	clearMatrix();
+
+	for (auto& node : nodes)
+	{
+		w = addNodeToDrawMatrix(node, m_DrawMatrix, x, y);
+		if (w == 0)
+		{
+			x += 2;
+		}
+		else
+		{
+			x += w + 2;
+		}
+
+	}
+
+	for (auto& row : m_DrawMatrix)
+	{
+		for (auto& val : row)
+		{
+			if (val != -1)
+			{
+				std::cout <<  m_Heap->m_HeapNodes[val]->getPriority() << "  ";
+			}
+		}
+		std::cout << std::endl;
+	}
 }

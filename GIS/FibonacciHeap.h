@@ -3,6 +3,7 @@
 #include "Edge.h"
 #include "Vertex.h"
 #include "HeapNode.h"
+#include "Utility.h"
 
 class FibonacciHeap;
 
@@ -16,19 +17,21 @@ public:
 	FibonacciHeap();
 	~FibonacciHeap();
 
-	void insert(VertexPtr ptr, EdgePtr edge);
+	HeapNodeId insert(VertexPtr ptr, EdgePtr edge);
 	NodePtr extractMin();
 	void printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose = false);
 	HeapNodePtr peekMinElement();
 	bool isEmpty();
 	size_t getSize();
 
+	HeapNodes m_HeapNodes;
+
 private:
 	HeapNodePtr m_MinElement;
 
-	HeapNodes m_HeapNodes;
+	
 
-	NodeId m_NextFreeNodeNumber;
+	HeapNodeId m_NextFreeNodeNumber;
 
 	//void decreaseKey();
 	//void cut(HeapNodePtr child, HeapNodePtr parent);

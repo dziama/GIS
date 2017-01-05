@@ -37,7 +37,7 @@ typedef long EdgeId;
 typedef long VertexPriority;
 typedef unsigned long EdgeWeight;
 typedef unsigned NodeDegree;
-typedef long NodeId;
+typedef long HeapNodeId;
 typedef long RootNodeCounter;
 typedef long LinkId;
 
@@ -56,8 +56,8 @@ typedef map<EdgeId, GraphEdgePtr> Edges;
 typedef shared_ptr<IHeapNode> NodePtr;
 typedef weak_ptr<IHeapNode> HeapNodePtr;
 
-typedef pair<VertexId, NodePtr> HeapPair;
-typedef map<VertexId, NodePtr> HeapNodes;
+typedef pair<HeapNodeId, NodePtr> HeapPair;
+typedef map<HeapNodeId, NodePtr> HeapNodes;
 
 class IVertex
 {
@@ -110,7 +110,7 @@ public:
 	virtual bool hasChild() = 0;
 	virtual bool hasParent() = 0;
 
-	virtual NodeId getNodeNumber() = 0;
+	virtual HeapNodeId getNodeNumber() = 0;
 
 	virtual EdgeWeight getPriority() = 0;
 };

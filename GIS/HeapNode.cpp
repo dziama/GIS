@@ -1,10 +1,21 @@
 #include "HeapNode.h"
 
-HeapNode::HeapNode(VertexPtr ptr, EdgePtr edge, NodeId num) :
-	m_Vertex{ptr}, m_Degree{ 0 }, m_Next{}, m_Prev{}, 
-	m_Edge{edge}, m_Child{}, m_Parent{}, 
+HeapNode::HeapNode(VertexPtr vert, EdgePtr edge, HeapNodeId num) :
+	m_Degree{0}, m_Next{}, m_Prev{}, 
 	m_Marked{false}, m_NodeNumber{num}
 {
+	if (vert.lock() == nullptr)
+	{
+		throw exception{ "Heap node cannot contain nullptr to Vertex!" };
+	}
+
+	if (edge.lock() == nullptr)
+	{
+		throw exception{ "Heap node cannot contain nullptr to Edge!" };
+	}
+
+	m_Vertex = vert;
+	m_Edge = edge;
 }
 
 //HeapNode::HeapNode(VertexPtr ptr, EdgeWeight priority, HeapNodePtr next, HeapNodePtr prev) :
@@ -106,7 +117,7 @@ HeapNode::HeapNode(VertexPtr ptr, EdgePtr edge, NodeId num) :
 	 return m_Edge.lock()->getWeight();
  }
 
- NodeId HeapNode::getNodeNumber()
+ HeapNodeId HeapNode::getNodeNumber()
  {
 	 return m_NodeNumber;
  }

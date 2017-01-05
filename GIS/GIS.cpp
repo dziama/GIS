@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
 	Matrix weight_matrix{};
 	Graph graph{};
-	HeapPtr heap;
+	HeapPtr heap{new FibonacciHeap{}};
 
 	if (graph_ifstream.is_open())
 	{
@@ -114,16 +114,42 @@ int main(int argc, char* argv[])
 				{
 					continue;
 				}
+				else if (i == j)
+				{
+					continue;
+				}
 				else
 				{
-					graph.addEdge(vertex_ids[i], vertex_ids[j], weight_matrix[i][j]);
+					EdgeId id = graph.addEdge(vertex_ids[i], vertex_ids[j], weight_matrix[i][j]);
+					if (id != -1)
+					{
+						edge_ids.push_back(id);
+					}
 				}
 			}
 		}
 
-		HeapGui gui{ heap };
+		for (unsigned i = 0; i < 10; ++i)
+		{
+			heap->insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]));
+		}
+
+		verifyNodeDoubleLinkedList(heap->peekMinElement().lock());
+		heap->printNodeList(std::cout, heap->peekMinElement(), true);
+
+		//HeapGui gui{heap};
 
 		
+
+		//gui.drawHeap(graph);
+
+		verifyNodePointer(heap->extractMin());
+		std::cout << std::endl;
+
+		verifyNodeDoubleLinkedList(heap->peekMinElement().lock());
+		heap->printNodeList(std::cout, heap->peekMinElement());
+
+		//gui.drawHeap(graph);
 	}
 	return 0;
 }

@@ -3,7 +3,7 @@
 #include "FibonacciHeap.h"
 #include "Links.h"
 
-typedef vector<NodeId> Row;
+typedef vector<HeapNodeId> Row;
 typedef vector<Row> DrawMatrix;
 
 class HeapGui
@@ -13,13 +13,14 @@ public:
 	~HeapGui();
 
 	void clearMatrix();
+	void drawHeap(IGraph& graph);
 private:
 	Window m_Window;
 	View m_ActiveView;
 
 	HeapPtr m_Heap;
 
-	static NodeId m_EmptyTile;
+	static HeapNodeId m_EmptyTile;
 
 	unsigned m_WidthDefault = 800;
 	unsigned m_HeightDefault = 600;
@@ -34,12 +35,12 @@ private:
 	SLinksChildPar m_SLinksChildPar;
 	DLinksSiblings m_DLinksSiblings;
 
-	void writeToMatrix(NodeId val, unsigned x, unsigned y);
+	void writeToMatrix(HeapNodeId val, unsigned x, unsigned y);
 	void registerDLinkSiblings(NodePtr& first, NodePtr& second);
 	void registerSLinkParentChild(NodePtr& node);
 	void registerDLinkParentChild(NodePtr& node);
 	long addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsigned y);
-	long xOffset(unsigned x, long w);
+	long xOffset(unsigned x);
 	
 };
 

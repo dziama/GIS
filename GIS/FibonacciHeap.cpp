@@ -1,6 +1,6 @@
 #include "FibonacciHeap.h"
 
-FibonacciHeap::FibonacciHeap() : m_NextFreeNodeNumber{0L}
+FibonacciHeap::FibonacciHeap() : m_NextFreeNodeNumber{1L}
 {
 }
 
@@ -11,12 +11,13 @@ FibonacciHeap::~FibonacciHeap()
 	m_HeapNodes.clear();
 }
 
-void FibonacciHeap::insert(VertexPtr ptr, EdgePtr edge)
+HeapNodeId FibonacciHeap::insert(VertexPtr ptr, EdgePtr edge)
 {
+	HeapNodeId id = m_NextFreeNodeNumber++;
 	//1,2,3,4,5,6,7
-	NodePtr new_node{new HeapNode{ptr, edge, m_NextFreeNodeNumber++}};
-	m_HeapNodes.insert(HeapPair(ptr.lock()->getId(), new_node));
-	new_node = m_HeapNodes[ptr.lock()->getId()];
+	NodePtr new_node{new HeapNode{ptr, edge, id}};
+	m_HeapNodes.insert(HeapPair(new_node->getNodeNumber(), new_node));
+	new_node = m_HeapNodes[new_node->getNodeNumber()];
 
 	new_node->setNext(new_node);
 	new_node->setPrev(new_node);
@@ -24,6 +25,7 @@ void FibonacciHeap::insert(VertexPtr ptr, EdgePtr edge)
 	//9
 	insertIntoRootList(new_node);
 	
+	return id;
 }
 
 bool FibonacciHeap::isEmpty()
@@ -49,7 +51,7 @@ NodePtr FibonacciHeap::extractMin()
 	if (m_MinElement.lock() != nullptr)
 	{
 		ptr = removeMinFromRootList();
-		m_HeapNodes.erase(ptr->getVertex().lock()->getId());
+		m_HeapNodes.erase(ptr->getNodeNumber());
 	}
 	return ptr;
 }
@@ -244,23 +246,27 @@ NodePtr FibonacciHeap::moveNodeChildrenToRootList(NodePtr& node)
 
 	node->setChild(HeapNodePtr{});
 
-	m_MinElement = prev;
+	m_MinElement = next;
 
 	return next;
 }
 
 NodePtr FibonacciHeap::removeMinFromRootList()
 {
-	NodePtr ptr;
 	auto min_ptr = m_MinElement.lock();
-	ptr = min_ptr;
+
+	removeFromRootList(min_ptr);
 
 	auto node = moveNodeChildrenToRootList(min_ptr);
 
+	verifyNodeDoubleLinkedList(node);
+
 	consolidate(node);
 
-	return ptr;
-}
+	verifyNodeDoubleLinkedList(node);
+
+	return min_ptr;
+} 
 
 void FibonacciHeap::printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose)
 {
