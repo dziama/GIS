@@ -1,6 +1,6 @@
 #include "FibonacciHeap.h"
 
-FibonacciHeap::FibonacciHeap() : m_NextFreeNodeNumber{1L}
+FibonacciHeap::FibonacciHeap() : m_NextFreeNodeNumber{0L}
 {
 }
 
@@ -246,7 +246,7 @@ NodePtr FibonacciHeap::moveNodeChildrenToRootList(NodePtr& node)
 
 	node->setChild(HeapNodePtr{});
 
-	m_MinElement = next;
+	m_MinElement = prev;
 
 	return next;
 }
@@ -255,15 +255,9 @@ NodePtr FibonacciHeap::removeMinFromRootList()
 {
 	auto min_ptr = m_MinElement.lock();
 
-	removeFromRootList(min_ptr);
-
 	auto node = moveNodeChildrenToRootList(min_ptr);
 
-	verifyNodeDoubleLinkedList(node);
-
 	consolidate(node);
-
-	verifyNodeDoubleLinkedList(node);
 
 	return min_ptr;
 } 
