@@ -52,7 +52,10 @@ void verifyNodePointer(NodePtr& listNode)
 		{
 			if (prev != listNode)
 			{
-				throw exception{ "Invalid listNode pointer linking! NextPtr points to the same node while PrevPtr points somwhere else!" };
+				stringstream errstr;
+				errstr << "Invalid listNode pointer linking! NextPtr points to the same node while PrevPtr points somwhere else! NodePriority:";
+				errstr << listNode->getPriority() << " Node number: " << listNode->getNodeNumber();
+				throw exception{ errstr.str().c_str() };
 			}
 		}
 
@@ -60,7 +63,10 @@ void verifyNodePointer(NodePtr& listNode)
 		{
 			if (next != listNode)
 			{
-				throw exception{ "Invalid listNode pointer linking! NextPtr points to the same node while PrevPtr points somwhere else!" };
+				stringstream errstr;
+				errstr << "Invalid listNode pointer linking! NextPtr points to the same node while PrevPtr points somwhere else! NodePriority:";
+				errstr << listNode->getPriority() << " Node number: " << listNode->getNodeNumber();
+				throw exception{ errstr.str().c_str() };
 			}
 		}
 	}
@@ -78,6 +84,7 @@ void verifyNodeDoubleLinkedList(NodePtr& listNode)
 	auto current = begin;
 	auto previous = begin;
 
+	unsigned cnt = 0;
 	//Moving forward(to right links)
 	do
 	{
@@ -85,12 +92,14 @@ void verifyNodeDoubleLinkedList(NodePtr& listNode)
 
 		previous = current;
 		current = current->getNext().lock();
+		cnt++;
 
 	} while (current != begin);
 
 	current = begin;
 	previous = begin;
 
+	cnt = 0;
 	//Moving backwards(left links)
 	do
 	{
@@ -98,6 +107,7 @@ void verifyNodeDoubleLinkedList(NodePtr& listNode)
 
 		previous = current;
 		current = current->getPrev().lock();
+		cnt++;
 
 	} while (current != begin);
 }

@@ -20,6 +20,8 @@ public:
 	HeapNodeId insert(VertexPtr ptr, EdgePtr edge);
 	NodePtr extractMin();
 	void printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose = false);
+	void printNode(ostream& stream, HeapNodePtr& ptr);
+
 	HeapNodePtr peekMinElement();
 	bool isEmpty();
 	size_t getSize();

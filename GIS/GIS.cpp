@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		for (unsigned i = 0; i < 10; ++i)
+		for (unsigned i = 0; i < 9; ++i)
 		{
 			heap->insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]));
 		}
@@ -146,8 +146,8 @@ int main(int argc, char* argv[])
 		verifyNodePointer(heap->extractMin());
 		std::cout << std::endl;
 
-		verifyNodeDoubleLinkedList(heap->peekMinElement().lock());
-		heap->printNodeList(std::cout, heap->peekMinElement());
+		//verifyNodeDoubleLinkedList(heap->peekMinElement().lock());
+		heap->printNodeList(std::cout, heap->peekMinElement(), true);
 
 		//gui.drawHeap(graph);
 	}

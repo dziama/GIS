@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(BUILD_AND_EMPTY_SMALLHEAP)
 
 BOOST_AUTO_TEST_CASE(LARGE_SEQUENCE_TEST)
 {
-	ifstream seq_ifstream;
+	/*ifstream seq_ifstream;
 	string seq_file = TEST_FILES_PATH + "Test_Seq.txt";
 
 	seq_ifstream.open(seq_file.c_str());
@@ -166,5 +166,76 @@ BOOST_AUTO_TEST_CASE(LARGE_SEQUENCE_TEST)
 	else
 	{
 		throw exception{ "Sequence file not found!" };
+	}*/
+}
+
+BOOST_AUTO_TEST_CASE(THIRD_DEGREE_SUBHEAP_TEST)
+{
+	Graph graph{};
+	FibonacciHeap heap{};
+	vector<VertexId> vertex_ids{};
+	vector<EdgeWeight> edge_ids{};
+	vector<HeapNodeId> heap_node_ids{};
+
+	long graph_matrix[10][10] =
+	{
+		{0,1,4,3,0,5,6,0,9,8},
+		{1,0,7,6,0,2,3,1,5,0},
+		{4,7,0,9,2,3,1,0,0,0},
+		{3,6,9,0,7,2,0,0,1,2},
+		{0,0,2,7,0,4,4,3,8,5},
+		{5,2,3,2,4,0,0,0,1,2},
+		{6,3,1,0,4,0,0,6,9,3},
+		{0,1,0,0,3,0,6,0,7,8},
+		{9,5,0,1,8,1,9,7,0,1},
+		{8,0,0,2,5,2,3,8,1,0}
+	};
+
+	for (unsigned i = 0; i < 10; ++i)
+	{
+		vertex_ids.push_back(graph.addVertex());
 	}
+
+	for (unsigned i = 0; i < 10; ++i)
+	{
+		for (unsigned j = 0; j < 10; ++j)
+		{
+			if (graph_matrix[i][j] == 0L)
+			{
+				continue;
+			}
+			else if (i == j)
+			{
+				continue;
+			}
+			else
+			{
+				EdgeId id = graph.addEdge(vertex_ids[i], vertex_ids[j], graph_matrix[i][j]);
+				if (id != -1)
+				{
+					edge_ids.push_back(id);
+				}
+			}
+		}
+	}
+
+	for (unsigned i = 0; i < 10; ++i)
+	{
+		heap.insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]));
+	}
+
+	verifyNodeDoubleLinkedList(heap.peekMinElement().lock());
+	heap.printNodeList(std::cout, heap.peekMinElement());
+
+	auto min = heap.extractMin();
+	verifyNodeDoubleLinkedList(heap.peekMinElement().lock());
+
+	std::cout << "Should be 2" << endl;
+	heap.printNodeList(std::cout, heap.peekMinElement(), true);
+
+	auto child = heap.peekMinElement().lock()->getNext().lock()->getChild();
+	verifyNodeDoubleLinkedList(child.lock());
+
+	std::cout << "Should be 6 4 5" << endl;
+	heap.printNodeList(std::cout, child);
 }

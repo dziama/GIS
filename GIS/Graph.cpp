@@ -80,12 +80,27 @@ EdgeId Graph::addEdge(VertexId vertexId1, VertexId vertexId2, EdgeWeight weight)
 
 VertexPtr Graph::getVertex(VertexId vertexId)
 {
-	return m_Vertices[vertexId];
+	if(m_Vertices.count(vertexId) > 0)
+	{
+		return m_Vertices[vertexId];
+	}
+	else
+	{
+		throw exception{ "Requested vertexID not found in Graph!" };
+	}
+	
 }
 
 EdgePtr Graph::getEdge(EdgeId edgeId)
 {
-	return m_Edges[edgeId];
+	if (m_Edges.count(edgeId) > 0)
+	{
+		return m_Edges[edgeId];
+	}
+	else
+	{
+		throw exception{ "Requested edgeID not found in Graph!" };
+	}
 }
 
 void Graph::getMinimumSpanningTree(GraphPtr& ptr)
