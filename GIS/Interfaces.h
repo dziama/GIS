@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cmath>
 #include <exception>
+#include <limits>
 
 using std::weak_ptr;
 using std::unique_ptr;
@@ -94,7 +95,8 @@ public:
 
 	virtual NodeDegree getDegree() = 0;
 	//virtual void setDegree(NodeDegree degree) = 0;
-	virtual void increaseDegree(NodeDegree increase) = 0;
+	virtual void increaseDegree() = 0;
+	virtual void decreaseDegree() = 0;
 
 	virtual void setNext(HeapNodePtr ptr) = 0;
 	virtual HeapNodePtr getNext() = 0;
@@ -109,6 +111,8 @@ public:
 
 	virtual bool hasChild() = 0;
 	virtual bool hasParent() = 0;
+
+	virtual void changeWeight(EdgeWeight weight) = 0;
 
 	virtual HeapNodeId getNodeNumber() = 0;
 

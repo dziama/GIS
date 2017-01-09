@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(INSERTING_INTO_ROOT_LIST_TEST)
 
 		for (unsigned i = 0; i < vertices.size(); ++i)
 		{
-			test_heap.insert(vertices[i], edges[i]);
+			test_heap.insert(vertices[i], edges[i]->getWeight());
 			verifyNodeDoubleLinkedList(test_heap.peekMinElement().lock());
 		}
 	}
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(BUILD_AND_EMPTY_SMALLHEAP)
 
 	for (unsigned itr = 0; itr < vertex_ids.size(); ++itr)
 	{
-		heap.insert(graph.getVertex(vertex_ids[itr]), graph.getEdge(edge_ids[itr]));
+		heap.insert(graph.getVertex(vertex_ids[itr]), graph.getEdge(edge_ids[itr]).lock()->getWeight());
 		verifyNodeDoubleLinkedList(heap.peekMinElement().lock());
 	}
 
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(THIRD_DEGREE_SUBHEAP_TEST)
 
 	for (unsigned i = 0; i < 10; ++i)
 	{
-		heap.insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]));
+		heap.insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]).lock()->getWeight());
 	}
 
 	verifyNodeDoubleLinkedList(heap.peekMinElement().lock());

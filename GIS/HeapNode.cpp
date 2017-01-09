@@ -1,6 +1,6 @@
 #include "HeapNode.h"
 
-HeapNode::HeapNode(VertexPtr vert, EdgePtr edge, HeapNodeId num) :
+HeapNode::HeapNode(VertexPtr vert, HeapNodeId num) :
 	m_Degree{0}, m_Next{}, m_Prev{}, 
 	m_Marked{false}, m_NodeNumber{num}
 {
@@ -9,20 +9,29 @@ HeapNode::HeapNode(VertexPtr vert, EdgePtr edge, HeapNodeId num) :
 		throw exception{ "Heap node cannot contain nullptr to Vertex!" };
 	}
 
-	if (edge.lock() == nullptr)
-	{
-		throw exception{ "Heap node cannot contain nullptr to Edge!" };
-	}
-
 	m_Vertex = vert;
-	m_Edge = edge;
+	m_Weight = std::numeric_limits<EdgeWeight>::max();
 }
 
-//HeapNode::HeapNode(VertexPtr ptr, EdgeWeight priority, HeapNodePtr next, HeapNodePtr prev) :
-//	m_Vertex{ ptr }, m_Degree{ 0 }, m_Next{ next }, m_Prev{ prev }, m_Priority{ priority }, m_Child{}, m_Parent{}, m_Marked{ false }
-//{
-//
-//}
+HeapNode::HeapNode(VertexPtr vert, HeapNodeId num, EdgeWeight initWeight) : 
+	m_Degree{ 0 }, m_Next{}, m_Prev{},
+	m_Marked{ false }, m_NodeNumber{ num }
+{
+	m_Vertex = vert;
+	m_Weight = initWeight;
+}
+
+void HeapNode::changeWeight(EdgeWeight weight)
+{
+	if (m_Weight > weight)
+	{
+		m_Weight = weight;
+	}
+	else
+	{
+		throw exception{ "HeapNode: Tried to change weight to higher!" };
+	}
+}
 
  HeapNodePtr HeapNode::getParent()
  {
@@ -54,9 +63,14 @@ HeapNode::HeapNode(VertexPtr vert, EdgePtr edge, HeapNodeId num) :
 //	 m_Degree = degree;
  //}
 
- void HeapNode::increaseDegree(NodeDegree increase)
+ void HeapNode::increaseDegree()
  {
-	 m_Degree += increase;
+	 ++m_Degree;
+ }
+
+ void HeapNode::decreaseDegree()
+ {
+	 --m_Degree;
  }
 
  void HeapNode::setNext(HeapNodePtr ptr)
@@ -114,7 +128,7 @@ HeapNode::HeapNode(VertexPtr vert, EdgePtr edge, HeapNodeId num) :
 
  EdgeWeight HeapNode::getPriority()
  {
-	 return m_Edge.lock()->getWeight();
+	 return m_Weight;
  }
 
  HeapNodeId HeapNode::getNodeNumber()

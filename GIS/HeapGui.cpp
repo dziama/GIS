@@ -2,18 +2,124 @@
 
 HeapNodeId HeapGui::m_EmptyTile{-1L};
 
-HeapGui::HeapGui(HeapPtr heap) : m_Heap{heap}
+HeapGui::HeapGui(FibonacciHeap& heap, Graph& graph) : m_Heap{heap}, m_Graph{graph}
 {
 	m_Window.create(VideoMode{m_WidthDefault, m_HeightDefault}, "Fibbonacci Heap");
+	m_Window.setVisible(false);
 	m_Window.setFramerateLimit(30);
 	m_NextFreeLinkId = 1;
 
-	m_TileSize.x = 20;
-	m_TileSize.y = 20;
+	auto center = getWindowCenter();
+	m_ActiveView.setCenter((float)center.x, (float)center.y);
+	m_ActiveView.setSize(m_ViewWidth, m_ViewHeight);
+
+	m_Window.setView(m_ActiveView);
+
+	m_TileSize.x = 30;
+	m_TileSize.y = 30;
+
+	m_DelayTime = sf::seconds(1.0f);
 }
 
 HeapGui::~HeapGui()
 {
+}
+
+void HeapGui::showGui()
+{
+	m_Window.setVisible(true);
+
+	//pick first vertex
+	//auto vertex = m_Graph.getVertex(0).lock();
+	//vector<EdgeId> edges;
+	//vector<pair<VertexPtr, EdgePtr>> new_heap_elements;
+
+	vector<pair<VertexId, VertexId>> mst_tree;
+
+	while (m_Window.isOpen())
+	{
+		processEvents();
+		m_Window.clear(Color::White);
+
+		auto vertices = m_Graph.getVertices();
+
+		////pick vertex-edge pairs from chosen vertex
+		//edges = vertex->getEdges();
+		//for (auto& edgeid : edges)
+		//{
+		//	auto edge = m_Graph.getEdge(edgeid).lock();
+		//	auto first = edge->getFirstVertex().lock();
+		//	auto second = edge->getSecondVertex().lock();
+
+		//	if (first->getId() == vertex->getId())
+		//	{
+		//		new_heap_elements.push_back(pair<VertexPtr, EdgePtr>{second, edge});
+		//	}
+		//	else if (second->getId() == vertex->getId())
+		//	{
+		//		new_heap_elements.push_back(pair<VertexPtr, EdgePtr>{first, edge});
+		//	}
+		//	else
+		//	{
+		//		throw exception{ "Invalid edge not connected to vertex that has pointer to it@!" };
+		//	}
+		//}
+
+		//for (auto& p : new_heap_elements)
+		//{
+		//	
+		//}
+
+		//insert them into heap
+		//1) Draw unlinked node somewhere, marked and heap with min node
+		//2) Draw marked inserted node and min node
+		//3) Just draw heap normally
+		//redrawing heap after each step
+
+		//extract min element from heap
+		//show how min element children are merged into root list
+		//1) Draw heap marking all min node children
+		//2) Draw heap without min node, with marked extracted min node children
+		//3) Draw heap normally
+
+		//show that all root node are marked
+		//1) Mark all root nodes
+		//2) Draw empty auxillary table (root nodes nubers)
+		//3) Draw heap with 
+		//draw auxilary table with links to contained nodes
+		//show how nodes are picked and how heap-link works
+		//redraw after each step
+		
+		drawHeap();
+
+		m_Window.display();
+	}
+	
+}
+
+void HeapGui::processEvents()
+{
+	Event ev;
+	while (m_Window.pollEvent(ev))
+	{
+		if (ev.type == Event::Closed)
+		{
+			m_Window.close();
+		}
+		if (ev.type == Event::KeyPressed)
+		{
+			if (ev.key.code == sf::Keyboard::Escape)
+			{
+				m_Window.close();
+			}
+		}
+	}
+}
+
+Vector2u HeapGui::getWindowCenter()
+{
+	auto windows_size = m_Window.getSize();
+	return Vector2u{ windows_size.x / 2, windows_size.y / 2 };
 }
 
 void HeapGui::clearMatrix()
@@ -125,15 +231,73 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 	}
 	else if (node->getDegree() == 1)
 	{
-		registerDLinkParentChild(node->getChild().lock());
 		addNodeToDrawMatrix(node->getChild().lock(), m, x, y + 2);
 		return 0L;
 	}
 	else if (node->getDegree() == 2)
 	{
-		addNodeToDrawMatrix(node->getChild().lock()->getPrev().lock(), m, x, y + 2);
-		addNodeToDrawMatrix(node->getChild().lock(), m, x + 2, y + 2);
-		return 2;
+		auto child = node->getChild().lock();
+
+		if (child->getDegree() == 1)
+		{
+			registerDLinkParentChild(child);
+			addNodeToDrawMatrix(child, m, x + 2, y + 2);
+		}
+		else
+		{
+			throw exception{ "DrawMatrix: Child of degree 2 subheap is not 1-degree!" };
+		}
+
+		child = child->getPrev().lock();
+		if (child->getDegree() == 0)
+		{
+			registerSLinkParentChild(child);
+			addNodeToDrawMatrix(child, m, x, y + 2);
+		}
+		else
+		{
+			throw exception{ "DrawMatrix:Second child of degree 2 subheap is not 0-degree!" };
+		}
+
+		return 2L;
+	}
+	else if (node->getDegree() == 3)
+	{
+		auto child = node->getChild().lock();
+
+		if (child->getDegree() == 2)
+		{
+			registerDLinkParentChild(child);
+			addNodeToDrawMatrix(child, m, x + 4, y + 2);
+		}
+		else
+		{
+			throw exception{ "DrawMatrix: Child of degree 3 subheap is not 2-degree!" };
+		}
+
+		child = child->getPrev().lock();
+		if (child->getDegree() == 1)
+		{
+			registerSLinkParentChild(child);
+			addNodeToDrawMatrix(child, m, x + 2, y + 2);
+		}
+		else
+		{
+			throw exception{ "DrawMatrix:Second child of degree 3 subheap is not 1-degree!" };
+		}
+
+		child = child->getPrev().lock();
+		if (child->getDegree() == 0)
+		{
+			registerSLinkParentChild(child);
+			addNodeToDrawMatrix(child, m, x, y + 2);
+		}
+		else
+		{
+			throw exception{ "DrawMatrix:Third child of degree 3 subheap is not 0-degree!" };
+		}
+
+		return 4L;
 	}
 	else
 	{
@@ -143,7 +307,7 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 
 		vector<NodePtr> children;
 		auto first_child = node->getChild().lock();
-		auto last_child = first_child->getPrev().lock();
+		auto last_child = first_child->getNext().lock();
 
 		registerDLinkParentChild(first_child);
 
@@ -152,9 +316,9 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 		{
 			children.push_back(current);
 			registerSLinkParentChild(current);
-			registerDLinkSiblings(current, current->getPrev().lock());
-			current = current->getPrev().lock();
-		} while (current != last_child);
+			registerDLinkSiblings(current, current->getNext().lock());
+			current = current->getNext().lock();
+		} while (current != first_child);
 
 		for (auto& child : children)
 		{
@@ -179,9 +343,9 @@ long HeapGui::xOffset(unsigned x)
 	return x + 2;
 }
 
-void HeapGui::drawHeap(IGraph& graph)
+void HeapGui::drawHeap()
 {
-	auto min = m_Heap->peekMinElement().lock();
+	auto min = m_Heap.peekMinElement().lock();
 	auto current = min;
 	vector<NodePtr> nodes;
 
@@ -208,18 +372,29 @@ void HeapGui::drawHeap(IGraph& graph)
 		{
 			x += w + 2;
 		}
-
 	}
 
-	for (auto& row : m_DrawMatrix)
+	RectangleShape tile{};
+	tile.setFillColor(Color::Cyan);
+	tile.setSize(Vector2f(m_TileSize.x, m_TileSize.y));
+	tile.setPosition(0, 0);
+
+	for (unsigned i = 0; i < m_DrawMatrix.size(); ++i)
 	{
-		for (auto& val : row)
+		for (unsigned j = 0; j < m_DrawMatrix[i].size(); ++j)
 		{
-			if (val != -1)
+			auto current_position = Vector2f(j * m_TileSize.x, i * m_TileSize.y);
+			tile.setPosition(current_position);
+			if (m_DrawMatrix[i][j] != m_EmptyTile)
 			{
-				std::cout <<  m_Heap->m_HeapNodes[val]->getPriority() << "  ";
+				tile.setFillColor(Color::Blue);
 			}
+			else
+			{
+				tile.setFillColor(Color::Cyan);
+			}
+
+			m_Window.draw(tile);
 		}
-		std::cout << std::endl;
 	}
 }

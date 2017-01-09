@@ -12,7 +12,8 @@ public:
 
 	virtual NodeDegree getDegree() override;
 	//virtual void setDegree(NodeDegree degree) override;
-	virtual void increaseDegree(NodeDegree increase) override;
+	virtual void increaseDegree() override;
+	virtual void decreaseDegree() override;
 
 	virtual void setNext(HeapNodePtr ptr) override;
 	virtual HeapNodePtr getNext() override;
@@ -28,12 +29,15 @@ public:
 	virtual bool hasChild() override;
 	virtual bool hasParent() override;
 
+	virtual void changeWeight(EdgeWeight weight) override;
+
 	virtual HeapNodeId getNodeNumber() override;
 
 	virtual EdgeWeight getPriority();
 
 	//HeapNode(VertexPtr ptr, EdgeWeight priority, HeapNodePtr next, HeapNodePtr prev);
-	HeapNode(VertexPtr vert, EdgePtr edge, HeapNodeId num);
+	HeapNode(VertexPtr vert, HeapNodeId num);
+	HeapNode(VertexPtr vert, HeapNodeId num, EdgeWeight initWeight);
 
 private:
 
@@ -50,5 +54,5 @@ private:
 
 	NodeDegree m_Degree;
 
-	EdgePtr m_Edge;
+	EdgeWeight m_Weight;
 };

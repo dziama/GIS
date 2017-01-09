@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
 	Matrix weight_matrix{};
 	Graph graph{};
-	HeapPtr heap{new FibonacciHeap{}};
+	FibonacciHeap heap{};
 
 	if (graph_ifstream.is_open())
 	{
@@ -129,27 +129,24 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		for (unsigned i = 0; i < 9; ++i)
+		for (unsigned i = 0; i < 10; ++i)
 		{
-			heap->insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]));
+			heap.insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]).lock()->getWeight());
 		}
 
-		verifyNodeDoubleLinkedList(heap->peekMinElement().lock());
-		heap->printNodeList(std::cout, heap->peekMinElement(), true);
+		verifyNodeDoubleLinkedList(heap.peekMinElement().lock());
+		heap.printNodeList(std::cout, heap.peekMinElement(), true);
 
-		//HeapGui gui{heap};
+		HeapGui gui{heap, graph};
 
-		
+		//gui.drawHeap();
 
-		//gui.drawHeap(graph);
-
-		verifyNodePointer(heap->extractMin());
-		std::cout << std::endl;
+		verifyNodePointer(heap.extractMin());
+		gui.showGui();
+		//std::cout << std::endl;
 
 		//verifyNodeDoubleLinkedList(heap->peekMinElement().lock());
-		heap->printNodeList(std::cout, heap->peekMinElement(), true);
-
-		//gui.drawHeap(graph);
+		//heap->printNodeList(std::cout, heap->peekMinElement(), true);
 	}
 	return 0;
 }

@@ -17,12 +17,13 @@ public:
 	FibonacciHeap();
 	~FibonacciHeap();
 
-	HeapNodeId insert(VertexPtr ptr, EdgePtr edge);
+	HeapNodeId insert(VertexPtr ptr, EdgeWeight weight = 0);
 	NodePtr extractMin();
+	void decreaseKey(VertexPtr ptr, EdgeWeight weight);
 	void printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose = false);
 	void printNode(ostream& stream, HeapNodePtr& ptr);
 
-	HeapNodePtr peekMinElement();
+	HeapNodePtr peekMinElement();  
 	bool isEmpty();
 	size_t getSize();
 
@@ -30,14 +31,11 @@ public:
 
 private:
 	HeapNodePtr m_MinElement;
-
-	
-
 	HeapNodeId m_NextFreeNodeNumber;
 
-	//void decreaseKey();
-	//void cut(HeapNodePtr child, HeapNodePtr parent);
-	//void cascadeCut(HeapNodePtr node);
+	NodePtr find(VertexPtr ptr);
+	void cut(NodePtr child, NodePtr parent);
+	void cascadeCut(NodePtr node);
 	//void deleteNodes(HeapNodePtr node);
 	//void merge(HeapNodePtr a, HeapNodePtr b);
 	//void findInHeap();
@@ -48,9 +46,8 @@ private:
 	bool pointerEmpty(const HeapNodePtr& ptr);
 
 	void insertIntoRootList(NodePtr& node);
-	void removeFromRootList(NodePtr& ptr);
+	void removeFromList(NodePtr& ptr);
 	NodePtr removeMinFromRootList();
 	NodePtr moveNodeChildrenToRootList(NodePtr& node);
-
 };
 

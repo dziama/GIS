@@ -24,8 +24,8 @@ void FibbonacciHeapTestClass::testExtractMin()
 	edge_ids.push_back(graph.addEdge(vertex_ids[0], vertex_ids[1], 15));
 	edge_ids.push_back(graph.addEdge(vertex_ids[1], vertex_ids[2], 1));
 
-	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[0]), graph.getEdge(edge_ids[0])));
-	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[1]), graph.getEdge(edge_ids[1])));
+	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[0]), graph.getEdge(edge_ids[0]).lock()->getWeight()));
+	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[1]), graph.getEdge(edge_ids[1]).lock()->getWeight()));
 
 	verifyNodeDoubleLinkedList(heap.peekMinElement().lock());
 
@@ -54,10 +54,10 @@ void FibbonacciHeapTestClass::testExtractMin()
 	edge_ids.push_back(graph.addEdge(vertex_ids[5], vertex_ids[4], 22));
 	edge_ids.push_back(graph.addEdge(vertex_ids[2], vertex_ids[4], 37));
 
-	heap.insert(graph.getVertex(vertex_ids[2]), graph.getEdge(edge_ids[2]));
-	heap.insert(graph.getVertex(vertex_ids[3]), graph.getEdge(edge_ids[3]));
-	heap.insert(graph.getVertex(vertex_ids[4]), graph.getEdge(edge_ids[4]));
-	heap.insert(graph.getVertex(vertex_ids[5]), graph.getEdge(edge_ids[5]));
+	heap.insert(graph.getVertex(vertex_ids[2]), graph.getEdge(edge_ids[2]).lock()->getWeight());
+	heap.insert(graph.getVertex(vertex_ids[3]), graph.getEdge(edge_ids[3]).lock()->getWeight());
+	heap.insert(graph.getVertex(vertex_ids[4]), graph.getEdge(edge_ids[4]).lock()->getWeight());
+	heap.insert(graph.getVertex(vertex_ids[5]), graph.getEdge(edge_ids[5]).lock()->getWeight());
 
 	std::cout << "Should be 10 15 16 22 37" << endl;
 	heap.printNodeList(std::cout, heap.peekMinElement());
@@ -111,7 +111,7 @@ void FibbonacciHeapTestClass::testHeapLink()
 
 	for (unsigned i = 0; i < vertex_ids.size(); ++i)
 	{
-		heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i])));
+		heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]).lock()->getWeight()));
 	}
 
 	std::cout << "Should be 1 15 12" << endl;
@@ -213,9 +213,9 @@ void FibbonacciHeapTestClass::testMoveNodeChildren()
 	edge_ids.push_back(graph.addEdge(vertex_ids[1], vertex_ids[2], 1));
 	edge_ids.push_back(graph.addEdge(vertex_ids[0], vertex_ids[2], 12));
 
-	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[0]), graph.getEdge(edge_ids[0])));
-	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[1]), graph.getEdge(edge_ids[1])));
-	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[2]), graph.getEdge(edge_ids[2])));
+	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[0]), graph.getEdge(edge_ids[0]).lock()->getWeight()));
+	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[1]), graph.getEdge(edge_ids[1]).lock()->getWeight()));
+	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[2]), graph.getEdge(edge_ids[2]).lock()->getWeight()));
 
 	auto parent = heap.m_HeapNodes[heap_node_ids[1]];
 
@@ -249,8 +249,8 @@ void FibbonacciHeapTestClass::testMoveNodeChildren()
 	edge_ids.push_back(graph.addEdge(vertex_ids[3], vertex_ids[4], 6));
 	edge_ids.push_back(graph.addEdge(vertex_ids[0], vertex_ids[3], 5));
 
-	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[3]), graph.getEdge(edge_ids[3])));
-	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[4]), graph.getEdge(edge_ids[4])));
+	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[3]), graph.getEdge(edge_ids[3]).lock()->getWeight()));
+	heap_node_ids.push_back(heap.insert(graph.getVertex(vertex_ids[4]), graph.getEdge(edge_ids[4]).lock()->getWeight()));
 
 	std::cout << "Should be 1 6 5" << endl;
 	heap.printNodeList(std::cout, heap.peekMinElement());

@@ -11,21 +11,119 @@ FibonacciHeap::~FibonacciHeap()
 	m_HeapNodes.clear();
 }
 
-HeapNodeId FibonacciHeap::insert(VertexPtr ptr, EdgePtr edge)
+void FibonacciHeap::cut(NodePtr child, NodePtr parent)
+{
+	auto child_next = child->getNext().lock();
+	auto child_prev = child->getPrev().lock();
+
+	if (parent->getChild().lock() == child)
+	{
+		if (parent->getDegree() == 1)
+		{
+			parent->setChild(HeapNodePtr{});
+		}
+		else if (child_next->getDegree() == child->getDegree() - 1)
+		{
+			parent->setChild(child_next);
+		}
+		else if(child_prev->getDegree() == child->getDegree() - 1)
+		{
+			parent->setChild(child_prev);
+		}
+		else
+		{
+			parent->setChild(child_prev);
+			throw exception{ "Cut: Error setting new child node of parent when cutting one of its children!" };
+		}
+	}
+
+	removeFromList(child);
+	child->setParent(HeapNodePtr{});
+	parent->decreaseDegree();
+	child->unmark();
+
+	insertIntoRootList(child);
+}
+
+void FibonacciHeap::cascadeCut(NodePtr node)
+{
+	auto node_parent = node->getParent().lock();
+	if (node_parent != nullptr)
+	{
+		if (node_parent->isMarked() == false)
+		{
+			node_parent->mark();
+		}
+		else
+		{
+			cut(node, node_parent);
+			cascadeCut(node_parent);
+		}
+	}
+}
+
+NodePtr FibonacciHeap::find(VertexPtr ptr)
+{
+	auto id = ptr.lock()->getId();
+	NodePtr node_ptr{};
+
+	for (auto& heapNode : m_HeapNodes)
+	{
+		auto vertex = heapNode.second->getVertex().lock();
+		if (vertex->getId() == id)
+		{
+			node_ptr = heapNode.second;
+		}
+	}
+
+	if (node_ptr == nullptr)
+	{
+		throw exception{ "Node not found in heap!" };
+	}
+	return node_ptr;
+}
+
+void FibonacciHeap::decreaseKey(VertexPtr ptr, EdgeWeight weight)
+{
+	auto node = find(ptr);
+	auto node_parent = node->getParent().lock();
+
+	if (node->getPriority() < weight)
+	{
+		throw exception{ "Edge to be changed has higher weight than previous!" };
+	}
+
+	if ((node_parent != nullptr) && (node->getPriority() < node_parent->getPriority()))
+	{
+		cut(node, node_parent);
+		cascadeCut(node_parent);
+	}
+
+	if (node->getPriority() < m_MinElement.lock()->getPriority())
+	{
+		m_MinElement = node;
+	}
+}
+
+HeapNodeId FibonacciHeap::insert(VertexPtr ptr, EdgeWeight weight)
 {
 	if (ptr.lock() == nullptr)
 	{
 		throw exception{ "FibbonacciHeap: VertexPtr passed as nullptr!" };
 	}
 
-	if (edge.lock() == nullptr)
-	{
-		throw exception{ "FibbonacciHeap: EdgePtr passed as nullptr!" };
-	}
-
 	HeapNodeId id = m_NextFreeNodeNumber++;
+	NodePtr new_node{};
+	if (weight == 0)
+	{
+		new_node = NodePtr(new HeapNode{ ptr, id });
+	}
+	else
+	{
+		new_node = NodePtr(new HeapNode{ ptr, id, weight});
+	}
+		
 	//1,2,3,4,5,6,7
-	NodePtr new_node{new HeapNode{ptr, edge, id}};
 	m_HeapNodes.insert(HeapPair(new_node->getNodeNumber(), new_node));
 	new_node = m_HeapNodes[new_node->getNodeNumber()];
 
@@ -66,7 +164,7 @@ NodePtr FibonacciHeap::extractMin()
 	return ptr;
 }
 
-void FibonacciHeap::removeFromRootList(NodePtr& ptr)
+void FibonacciHeap::removeFromList(NodePtr& ptr)
 {
 	auto next = ptr->getNext().lock();
 	auto prev = ptr->getPrev().lock();
@@ -80,7 +178,7 @@ void FibonacciHeap::removeFromRootList(NodePtr& ptr)
 
 void FibonacciHeap::heapLink(NodePtr& toChild, NodePtr& toParent)
 {
-	removeFromRootList(toChild);
+	removeFromList(toChild);
 
 	if (toParent->getDegree() > 1)
 	{
@@ -109,7 +207,7 @@ void FibonacciHeap::heapLink(NodePtr& toChild, NodePtr& toParent)
 		toChild->setPrev(toChild);
 	}
 
-	toParent->increaseDegree(1);
+	toParent->increaseDegree();
 	toParent->setChild(toChild);
 	toChild->setParent(toParent);
 	toChild->unmark();
@@ -161,7 +259,7 @@ void FibonacciHeap::consolidate(NodePtr begin)
 
 		if (degree == 0)
 		{
-			removeFromRootList(visted_node);
+			removeFromList(visted_node);
 		}
 
 		while (auxTableSentry(degree))
