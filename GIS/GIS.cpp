@@ -3,6 +3,7 @@
 #include "FibonacciHeap.h"
 #include "Utility.h"
 #include "HeapGui.h"
+#include "SFML.h"
 
 #include <boost\program_options.hpp>
 #include <boost\filesystem.hpp>
@@ -50,103 +51,97 @@ void testRootList(GraphPtr& graph)
 
 int main(int argc, char* argv[])
 {
-	ProgramOptions options("Program arguments");
-	options.add_options()
-		(option_help.c_str(), "Help message")
-		(option_graph_file.c_str(), po::value<string>(), "File with graph")
-		(option_coords_file.c_str(), po::value<string>(), "File with vertices coordinates");
-
-	po::variables_map variables;
-	po::store(po::parse_command_line(argc, argv, options), variables);
-	po::notify(variables);
-
-	fs::path graph_file;
-	fs::path coords_file;
-
-	if (variables.count(option_help.c_str()))
+	try
 	{
-		return 0;
-	}
+		ProgramOptions options("Program arguments");
+		options.add_options()
+			(option_help.c_str(), "Help message")
+			(option_graph_file.c_str(), po::value<string>(), "File with graph")
+			(option_coords_file.c_str(), po::value<string>(), "File with vertices coordinates");
 
-	if (variables.count(option_graph_file.c_str()))
-	{
-		graph_file = fs::path(variables[option_graph_file].as<string>());
-	}
-	else
-	{
-		return 1;
-	}
+		po::variables_map variables;
+		po::store(po::parse_command_line(argc, argv, options), variables);
+		po::notify(variables);
 
-	if (variables.count(option_coords_file.c_str()))
-	{
-		coords_file = fs::path(variables[option_coords_file].as<string>());
-	}
-	else
-	{
-		return 2;
-	}
+		fs::path graph_file;
+		fs::path coords_file;
 
-	ifstream graph_ifstream;
-
-	graph_ifstream.open(graph_file.c_str());
-
-	Matrix weight_matrix{};
-	Graph graph{};
-	FibonacciHeap heap{};
-
-	if (graph_ifstream.is_open())
-	{
-		readMatrix(graph_ifstream, weight_matrix);
-
-		vector<VertexId> vertex_ids;
-		vector<EdgeId> edge_ids;
-
-		for (unsigned i = 0; i < weight_matrix.size(); ++i)
+		if (variables.count(option_help.c_str()))
 		{
-			vertex_ids.push_back(graph.addVertex());
+			return 0;
 		}
 
-		for (unsigned i = 0; i < weight_matrix.size(); ++i)
+		if (variables.count(option_graph_file.c_str()))
 		{
-			for (unsigned j = 0; j < weight_matrix.size(); ++j)
+			graph_file = fs::path(variables[option_graph_file].as<string>());
+		}
+		else
+		{
+			return 1;
+		}
+
+		if (variables.count(option_coords_file.c_str()))
+		{
+			coords_file = fs::path(variables[option_coords_file].as<string>());
+		}
+		else
+		{
+			return 2;
+		}
+
+		string font_path = "E:/FUTRFW.TTF";
+		Font font;
+		bool result = font.loadFromFile(font_path);
+		ifstream graph_ifstream;
+
+		graph_ifstream.open(graph_file.c_str());
+
+		Matrix weight_matrix{};
+		Graph graph{};
+		FibonacciHeap heap{};
+
+		if (graph_ifstream.is_open())
+		{
+			readMatrix(graph_ifstream, weight_matrix);
+
+			vector<VertexId> vertex_ids;
+			vector<EdgeId> edge_ids;
+
+			for (unsigned i = 0; i < weight_matrix.size(); ++i)
 			{
-				if (weight_matrix[i][j] == 0L)
+				vertex_ids.push_back(graph.addVertex());
+			}
+
+			for (unsigned i = 0; i < weight_matrix.size(); ++i)
+			{
+				for (unsigned j = 0; j < weight_matrix.size(); ++j)
 				{
-					continue;
-				}
-				else if (i == j)
-				{
-					continue;
-				}
-				else
-				{
-					EdgeId id = graph.addEdge(vertex_ids[i], vertex_ids[j], weight_matrix[i][j]);
-					if (id != -1)
+					if (weight_matrix[i][j] == 0L)
 					{
-						edge_ids.push_back(id);
+						continue;
+					}
+					else if (i == j)
+					{
+						continue;
+					}
+					else
+					{
+						EdgeId id = graph.addEdge(vertex_ids[i], vertex_ids[j], weight_matrix[i][j]);
+						if (id != -1)
+						{
+							edge_ids.push_back(id);
+						}
 					}
 				}
 			}
+
+			HeapGui gui{ heap, graph, font };
+			gui.showGui();
 		}
-
-		for (unsigned i = 0; i < 10; ++i)
-		{
-			heap.insert(graph.getVertex(vertex_ids[i]), graph.getEdge(edge_ids[i]).lock()->getWeight());
-		}
-
-		verifyNodeDoubleLinkedList(heap.peekMinElement().lock());
-		heap.printNodeList(std::cout, heap.peekMinElement(), true);
-
-		HeapGui gui{heap, graph};
-
-		//gui.drawHeap();
-
-		verifyNodePointer(heap.extractMin());
-		gui.showGui();
-		//std::cout << std::endl;
-
-		//verifyNodeDoubleLinkedList(heap->peekMinElement().lock());
-		//heap->printNodeList(std::cout, heap->peekMinElement(), true);
+	}
+	catch (exception& ex)
+	{
+		std::cout << ex.what() << std::endl;
 	}
 	return 0;
 }

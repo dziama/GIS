@@ -26,14 +26,15 @@ public:
 	HeapNodePtr peekMinElement();  
 	bool isEmpty();
 	size_t getSize();
-
+	//bool contains(VertexPtr ptr);
+	NodePtr find(VertexPtr ptr);
+	NodePtr find(HeapNodeId id);
 	HeapNodes m_HeapNodes;
 
 private:
 	HeapNodePtr m_MinElement;
 	HeapNodeId m_NextFreeNodeNumber;
-
-	NodePtr find(VertexPtr ptr);
+	
 	void cut(NodePtr child, NodePtr parent);
 	void cascadeCut(NodePtr node);
 	//void deleteNodes(HeapNodePtr node);
@@ -41,7 +42,6 @@ private:
 	//void findInHeap();
 	void heapLink(NodePtr& toChild, NodePtr& toParent);
 	void consolidate(NodePtr begin);
-	
 
 	bool pointerEmpty(const HeapNodePtr& ptr);
 

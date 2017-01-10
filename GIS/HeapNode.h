@@ -29,7 +29,7 @@ public:
 	virtual bool hasChild() override;
 	virtual bool hasParent() override;
 
-	virtual void changeWeight(EdgeWeight weight) override;
+	virtual void setPriority(EdgeWeight weight) override;
 
 	virtual HeapNodeId getNodeNumber() override;
 

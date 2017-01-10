@@ -3,14 +3,17 @@
 #include "FibonacciHeap.h"
 #include "Links.h"
 #include "Graph.h"
+#include "HeapNodeGui.h"
 
 typedef vector<HeapNodeId> Row;
 typedef vector<Row> DrawMatrix;
+typedef pair<VertexPtr, VertexPtr> VertexPair;
+typedef vector<VertexPair> VertexPairs;
 
 class HeapGui
 {
 public:
-	HeapGui(FibonacciHeap& heap, Graph& graph);
+	HeapGui(FibonacciHeap& heap, Graph& graph, Font& font);
 	~HeapGui();
 
 	void clearMatrix();
@@ -39,6 +42,8 @@ private:
 
 	Time m_DelayTime;
 
+	Font m_Font;
+
 	DLinksParChild m_DLinksParChild;
 	SLinksChildPar m_SLinksChildPar;
 	DLinksSiblings m_DLinksSiblings;
@@ -50,8 +55,7 @@ private:
 	long addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsigned y);
 	long xOffset(unsigned x);
 	Vector2u getWindowCenter();
-
-
+	void drawStep();
 
 	void processEvents();
 };

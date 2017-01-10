@@ -239,3 +239,13 @@ BOOST_AUTO_TEST_CASE(THIRD_DEGREE_SUBHEAP_TEST)
 	std::cout << "Should be 6 4 5" << endl;
 	heap.printNodeList(std::cout, child);
 }
+
+BOOST_AUTO_TEST_CASE(CUT_TEST)
+{
+
+}
+
+BOOST_AUTO_TEST_CASE(CASCADE_CUT_TEST)
+{
+
+}

@@ -21,7 +21,7 @@ HeapNode::HeapNode(VertexPtr vert, HeapNodeId num, EdgeWeight initWeight) :
 	m_Weight = initWeight;
 }
 
-void HeapNode::changeWeight(EdgeWeight weight)
+void HeapNode::setPriority(EdgeWeight weight)
 {
 	if (m_Weight > weight)
 	{

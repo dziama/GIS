@@ -10,6 +10,8 @@
 #include <cmath>
 #include <exception>
 #include <limits>
+#include <thread>
+#include <chrono>
 
 using std::weak_ptr;
 using std::unique_ptr;
@@ -27,6 +29,8 @@ using std::exception;
 using std::stringstream;
 using std::ifstream;
 using std::getline;
+
+using namespace std::chrono_literals;
 
 class IVertex;
 class IEdge;
@@ -112,11 +116,12 @@ public:
 	virtual bool hasChild() = 0;
 	virtual bool hasParent() = 0;
 
-	virtual void changeWeight(EdgeWeight weight) = 0;
+	
 
 	virtual HeapNodeId getNodeNumber() = 0;
 
 	virtual EdgeWeight getPriority() = 0;
+	virtual void setPriority(EdgeWeight weight) = 0;
 };
 
 class IGraph

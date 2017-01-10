@@ -17,3 +17,5 @@ using sf::RenderWindow;
 using sf::Event;
 using sf::RectangleShape;
 using sf::Time;
+using sf::Clock;
+using sf::Font;

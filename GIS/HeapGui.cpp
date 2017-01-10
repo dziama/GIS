@@ -2,7 +2,7 @@
 
 HeapNodeId HeapGui::m_EmptyTile{-1L};
 
-HeapGui::HeapGui(FibonacciHeap& heap, Graph& graph) : m_Heap{heap}, m_Graph{graph}
+HeapGui::HeapGui(FibonacciHeap& heap, Graph& graph, Font& font) : m_Heap{heap}, m_Graph{graph}, m_Font{font}
 {
 	m_Window.create(VideoMode{m_WidthDefault, m_HeightDefault}, "Fibbonacci Heap");
 	m_Window.setVisible(false);
@@ -18,11 +18,22 @@ HeapGui::HeapGui(FibonacciHeap& heap, Graph& graph) : m_Heap{heap}, m_Graph{grap
 	m_TileSize.x = 30;
 	m_TileSize.y = 30;
 
-	m_DelayTime = sf::seconds(1.0f);
+	m_DelayTime = sf::seconds(3.0f);
 }
 
 HeapGui::~HeapGui()
 {
+}
+
+void HeapGui::drawStep()
+{
+	processEvents();
+	m_Window.clear(Color::White);
+
+	drawHeap();
+	m_Window.display();
+
+	std::this_thread::sleep_for(1s);
 }
 
 void HeapGui::showGui()
@@ -34,14 +45,117 @@ void HeapGui::showGui()
 	//vector<EdgeId> edges;
 	//vector<pair<VertexPtr, EdgePtr>> new_heap_elements;
 
-	vector<pair<VertexId, VertexId>> mst_tree;
+	VertexPairs mst_tree;
+	VertexPairs vertex_vertex_parent; //vertex-vertex parent
 
+	processEvents();
+	m_Window.clear(Color::White);
+
+	auto vertices = m_Graph.getVertices();
+	VertexPtr u;
+
+	//Set each node parent to null
+	for (auto& vertex : vertices)
+	{
+		vertex_vertex_parent.push_back(VertexPair(vertex.second, VertexPtr{}));
+	}
+
+	//insert first vertex (with lowest priority)
+	m_Heap.insert(vertices[0], 0);
+	drawStep();
+
+	//insert rest of vertices, with unsigned long max value(close enough... Infinity)
+	for (unsigned i = 1; i < vertices.size(); ++i)
+	{
+		m_Heap.insert(vertices[i], std::numeric_limits<EdgeWeight>::max());
+		drawStep();
+	}
+
+	auto getParent = [&vertex_vertex_parent](VertexPtr ptr) -> VertexPtr
+	{
+		for (auto& pair : vertex_vertex_parent)
+		{
+			auto first = pair.first.lock();
+			auto second = pair.second.lock();
+
+			if (first == ptr.lock())
+			{
+				return second;
+			}
+		}
+		throw exception{ "getParent lambda: Parent not found!" };
+	};
+
+	auto setParent = [&vertex_vertex_parent](VertexPtr vertex, VertexPtr newParent)
+	{
+		for (auto& pair : vertex_vertex_parent)
+		{
+			if (pair.first.lock() == vertex.lock())
+			{
+				pair.second = newParent;
+				return;
+			}
+		}
+	};
+
+	auto getEdges = [](VertexPtr& vert, Graph& graph) -> vector<EdgePtr>
+	{
+		vector<EdgePtr> edges;
+		auto edges_ids = vert.lock()->getEdges();
+
+		for (auto& edge_id : edges_ids)
+		{
+			edges.push_back(graph.getEdge(edge_id));
+		}
+		return edges;
+	};
+	
 	while (m_Window.isOpen())
 	{
-		processEvents();
-		m_Window.clear(Color::White);
+		if(m_Heap.isEmpty() == false)
+		{
+			u = m_Heap.extractMin()->getVertex();
+			drawStep();
 
-		auto vertices = m_Graph.getVertices();
+			auto parent = getParent(u);
+			mst_tree.push_back(VertexPair(u, parent));
+
+			auto edges = getEdges(u, m_Graph);
+
+			for (auto& edge : edges)
+			{
+				auto edge_ptr = edge.lock();
+				auto first = edge_ptr->getFirstVertex().lock();
+				auto second = edge_ptr->getSecondVertex().lock();
+
+				if (first == u.lock())
+				{
+					auto node = m_Heap.find(second);
+					if ((node != nullptr) && (edge_ptr->getWeight() < node->getPriority()))
+					{
+						m_Heap.decreaseKey(node->getVertex(), edge_ptr->getWeight());
+						drawStep();
+
+						setParent(node->getVertex(), second);
+					}
+				}
+				else if(second == u.lock())
+				{
+					auto node = m_Heap.find(first);
+					if ((node != nullptr) && (edge_ptr->getWeight() < node->getPriority()))
+					{
+						m_Heap.decreaseKey(node->getVertex(), edge_ptr->getWeight());
+						drawStep();
+
+						setParent(node->getVertex(), first);
+					}
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
 
 		////pick vertex-edge pairs from chosen vertex
 		//edges = vertex->getEdges();
@@ -89,10 +203,6 @@ void HeapGui::showGui()
 		//draw auxilary table with links to contained nodes
 		//show how nodes are picked and how heap-link works
 		//redraw after each step
-		
-		drawHeap();
-
-		m_Window.display();
 	}
 	
 }
@@ -234,34 +344,43 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 		addNodeToDrawMatrix(node->getChild().lock(), m, x, y + 2);
 		return 0L;
 	}
-	else if (node->getDegree() == 2)
+	/*else if (node->getDegree() == 2)
 	{
 		auto child = node->getChild().lock();
+		auto second_child = child->getPrev().lock();
+
+
 
 		if (child->getDegree() == 1)
 		{
 			registerDLinkParentChild(child);
 			addNodeToDrawMatrix(child, m, x + 2, y + 2);
 		}
-		else
-		{
-			throw exception{ "DrawMatrix: Child of degree 2 subheap is not 1-degree!" };
-		}
-
-		child = child->getPrev().lock();
-		if (child->getDegree() == 0)
+		else if (child->getDegree() == 0)
 		{
 			registerSLinkParentChild(child);
 			addNodeToDrawMatrix(child, m, x, y + 2);
 		}
 		else
 		{
-			throw exception{ "DrawMatrix:Second child of degree 2 subheap is not 0-degree!" };
+
 		}
 
+		if (child->getDegree() == 1)
+		{
+			registerDLinkParentChild(child);
+			addNodeToDrawMatrix(child, m, x + 2, y + 2);
+		}
+		if (child->getDegree() == 0)
+		{
+			registerSLinkParentChild(child);
+			addNodeToDrawMatrix(child, m, x, y + 2);
+		}
+
+
 		return 2L;
-	}
-	else if (node->getDegree() == 3)
+	}*/
+	/*else if (node->getDegree() == 3)
 	{
 		auto child = node->getChild().lock();
 
@@ -298,7 +417,7 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 		}
 
 		return 4L;
-	}
+	}*/
 	else
 	{
 		y = y + 2;
@@ -349,14 +468,16 @@ void HeapGui::drawHeap()
 	auto current = min;
 	vector<NodePtr> nodes;
 
+	verifyNodeDoubleLinkedList(min);
+
 	do
 	{
 		nodes.push_back(current);
 		current = current->getNext().lock();
 	} while (current != min);
 
-	unsigned x = 1;
-	unsigned y = 1;
+	unsigned x = 0;
+	unsigned y = 0;
 	long w = 0;
 
 	clearMatrix();
@@ -374,27 +495,31 @@ void HeapGui::drawHeap()
 		}
 	}
 
-	RectangleShape tile{};
-	tile.setFillColor(Color::Cyan);
-	tile.setSize(Vector2f(m_TileSize.x, m_TileSize.y));
-	tile.setPosition(0, 0);
+	HeapNodeGui node_gui{m_TileSize, m_Font};
+	node_gui.setPosition(Vector2f(0, 0));
 
 	for (unsigned i = 0; i < m_DrawMatrix.size(); ++i)
 	{
 		for (unsigned j = 0; j < m_DrawMatrix[i].size(); ++j)
 		{
 			auto current_position = Vector2f(j * m_TileSize.x, i * m_TileSize.y);
-			tile.setPosition(current_position);
+			node_gui.setPosition(current_position);
+			//tile.setPosition(current_position);
 			if (m_DrawMatrix[i][j] != m_EmptyTile)
 			{
-				tile.setFillColor(Color::Blue);
+				auto node_ptr = m_Heap.find(m_DrawMatrix[i][j]);
+				node_gui.setNode(node_ptr);
+
+				node_gui.draw(m_Window, m_Heap);
 			}
 			else
 			{
+				RectangleShape tile{};
 				tile.setFillColor(Color::Cyan);
+				tile.setSize(Vector2f(m_TileSize.x, m_TileSize.y));
+				tile.setPosition(current_position);
+				m_Window.draw(tile);
 			}
-
-			m_Window.draw(tile);
 		}
 	}
 }
