@@ -4,6 +4,7 @@ HeapNodeId HeapGui::m_EmptyTile{-1L};
 
 HeapGui::HeapGui(FibonacciHeap& heap, Graph& graph, Font& font) : m_Heap{heap}, m_Graph{graph}, m_Font{font}
 {
+	//Wstepne ustawienia zmiennych
 	m_Window.create(VideoMode{m_WidthDefault, m_HeightDefault}, "Fibbonacci Heap");
 	m_Window.setVisible(false);
 	m_Window.setFramerateLimit(30);
@@ -17,60 +18,66 @@ HeapGui::HeapGui(FibonacciHeap& heap, Graph& graph, Font& font) : m_Heap{heap}, 
 
 	m_TileSize.x = 30;
 	m_TileSize.y = 30;
-
-	m_DelayTime = sf::seconds(3.0f);
-}
-
-HeapGui::~HeapGui()
-{
 }
 
 void HeapGui::drawStep()
 {
+	//Zareaguj na zdarzenia
 	processEvents();
+
+	//Wczysc okno
 	m_Window.clear(Color::White);
 
+	//Narysuj kopiec
 	drawHeap();
+
+	//Wyswietl zaktualizowane okno
 	m_Window.display();
 
-	std::this_thread::sleep_for(1s);
+	//Zaczekaj by widac bylo zmiany
+	std::this_thread::sleep_for(2s);
 }
 
 void HeapGui::showGui()
 {
+	//Okno - widoczne
 	m_Window.setVisible(true);
 
-	//pick first vertex
-	//auto vertex = m_Graph.getVertex(0).lock();
-	//vector<EdgeId> edges;
-	//vector<pair<VertexPtr, EdgePtr>> new_heap_elements;
-
+	//Budowane drzewo MST
 	VertexPairs mst_tree;
-	VertexPairs vertex_vertex_parent; //vertex-vertex parent
 
-	processEvents();
+	//Zbior par wierzcholkow: wierzcholek i jego rodzic
+	VertexPairs vertex_vertex_parent;
+
+	//Wyczysc okno
 	m_Window.clear(Color::White);
 
+	//Pobierz wszystkie wierzcholki grafu
 	auto vertices = m_Graph.getVertices();
+
+	//Wierzcholek 'u'
 	VertexPtr u;
 
-	//Set each node parent to null
+	//Stworz zbior wierzcholkow: wierzcholek : rodzic, zainicjalizuj rodziców jako pustych
 	for (auto& vertex : vertices)
 	{
 		vertex_vertex_parent.push_back(VertexPair(vertex.second, VertexPtr{}));
 	}
 
-	//insert first vertex (with lowest priority)
+	//Wstaw pierwszy wierzcholek do kopca, z waga 0 (aby byl wyjety jako pierwszy)
 	m_Heap.insert(vertices[0], 0);
+
+	//Narysuj
 	drawStep();
 
-	//insert rest of vertices, with unsigned long max value(close enough... Infinity)
+	//Wstaw pozostale wierzcholki z priorytetem/waga nieskonczonosc (Maxymalna wartosc dla long)
 	for (unsigned i = 1; i < vertices.size(); ++i)
 	{
 		m_Heap.insert(vertices[i], std::numeric_limits<EdgeWeight>::max());
 		drawStep();
 	}
 
+	//Funkcja Lambda, zwraca rodzica wierzcholka
 	auto getParent = [&vertex_vertex_parent](VertexPtr ptr) -> VertexPtr
 	{
 		for (auto& pair : vertex_vertex_parent)
@@ -86,6 +93,7 @@ void HeapGui::showGui()
 		throw exception{ "getParent lambda: Parent not found!" };
 	};
 
+	//Funkcja Lambda, ustawia rodzica wierzcholka
 	auto setParent = [&vertex_vertex_parent](VertexPtr vertex, VertexPtr newParent)
 	{
 		for (auto& pair : vertex_vertex_parent)
@@ -98,6 +106,7 @@ void HeapGui::showGui()
 		}
 	};
 
+	//Funkcja Lambda, zwraca krawedzie sasiednie z podanym wierzcholkiem
 	auto getEdges = [](VertexPtr& vert, Graph& graph) -> vector<EdgePtr>
 	{
 		vector<EdgePtr> edges;
@@ -110,37 +119,53 @@ void HeapGui::showGui()
 		return edges;
 	};
 	
+	//Dopoki okno jest aktywne...
 	while (m_Window.isOpen())
 	{
+		//Jesli kopiec nie jest pusty, kontyynujuemy algorytm Prima
 		if(m_Heap.isEmpty() == false)
 		{
+			//Pobierz kolejny wierzcholek o najmniejszej wadze/priorytecie (najlzejsza krawedz)
 			u = m_Heap.extractMin()->getVertex();
 			drawStep();
 
+			//Pobierz rodzica, wstaw do drzewa MST pare
 			auto parent = getParent(u);
 			mst_tree.push_back(VertexPair(u, parent));
 
+			//Pobierz krawedzie wierzcholka 'u'
 			auto edges = getEdges(u, m_Graph);
 
+			//Dla wszystkich krawedzi wierzcholka 'u'...
 			for (auto& edge : edges)
 			{
 				auto edge_ptr = edge.lock();
+
+				//Pobierz z krawedzi wskazniki na pierwszy i drugi wierzcholek do niej podlaczony
 				auto first = edge_ptr->getFirstVertex().lock();
 				auto second = edge_ptr->getSecondVertex().lock();
 
-				if (first == u.lock())
+
+				if (first == u.lock()) //jesli pierwszym jest 'u', zajmij sie drugim
 				{
+					//Znajdz w kopcu dany wierzcholek
 					auto node = m_Heap.find(second);
+
+					//Jesli dany wierzcholek jest w kopcu (nie jest wskaznikiem nullptr) i jego priorytet
+					//jest lepszy od tego zapisanego w kopcu...
 					if ((node != nullptr) && (edge_ptr->getWeight() < node->getPriority()))
 					{
+						//Zmniejsz jego priorytet
 						m_Heap.decreaseKey(node->getVertex(), edge_ptr->getWeight());
 						drawStep();
 
+						//Ustaw nowego rodzica
 						setParent(node->getVertex(), second);
 					}
 				}
-				else if(second == u.lock())
+				else if(second == u.lock()) //odwrotnie, zajmij sie pierwszym ktory nie jest 'u'
 				{
+					//Dzialania zupelnie analogicznie jak wyzej
 					auto node = m_Heap.find(first);
 					if ((node != nullptr) && (edge_ptr->getWeight() < node->getPriority()))
 					{
@@ -156,53 +181,6 @@ void HeapGui::showGui()
 				}
 			}
 		}
-
-		////pick vertex-edge pairs from chosen vertex
-		//edges = vertex->getEdges();
-		//for (auto& edgeid : edges)
-		//{
-		//	auto edge = m_Graph.getEdge(edgeid).lock();
-		//	auto first = edge->getFirstVertex().lock();
-		//	auto second = edge->getSecondVertex().lock();
-
-		//	if (first->getId() == vertex->getId())
-		//	{
-		//		new_heap_elements.push_back(pair<VertexPtr, EdgePtr>{second, edge});
-		//	}
-		//	else if (second->getId() == vertex->getId())
-		//	{
-		//		new_heap_elements.push_back(pair<VertexPtr, EdgePtr>{first, edge});
-		//	}
-		//	else
-		//	{
-		//		throw exception{ "Invalid edge not connected to vertex that has pointer to it@!" };
-		//	}
-		//}
-
-		//for (auto& p : new_heap_elements)
-		//{
-		//	
-		//}
-
-		//insert them into heap
-		//1) Draw unlinked node somewhere, marked and heap with min node
-		//2) Draw marked inserted node and min node
-		//3) Just draw heap normally
-		//redrawing heap after each step
-
-		//extract min element from heap
-		//show how min element children are merged into root list
-		//1) Draw heap marking all min node children
-		//2) Draw heap without min node, with marked extracted min node children
-		//3) Draw heap normally
-
-		//show that all root node are marked
-		//1) Mark all root nodes
-		//2) Draw empty auxillary table (root nodes nubers)
-		//3) Draw heap with 
-		//draw auxilary table with links to contained nodes
-		//show how nodes are picked and how heap-link works
-		//redraw after each step
 	}
 	
 }
@@ -218,6 +196,7 @@ void HeapGui::processEvents()
 		}
 		if (ev.type == Event::KeyPressed)
 		{
+			//Przycisk escape konczy dzialanie programu
 			if (ev.key.code == sf::Keyboard::Escape)
 			{
 				m_Window.close();
@@ -245,6 +224,7 @@ void HeapGui::clearMatrix()
 
 void HeapGui::writeToMatrix(HeapNodeId val, unsigned x, unsigned y)
 {
+	//Jesli macierz jest pusta, inicjalizujemy ja
 	if (m_DrawMatrix.size() == 0)
 	{
 		Row row{};
@@ -252,10 +232,13 @@ void HeapGui::writeToMatrix(HeapNodeId val, unsigned x, unsigned y)
 		m_DrawMatrix.push_back(row);
 	}
 
+	//Koordynaty macierzy sa inne niz orientacja na ekranie, zamieniamy wspolzedne
 	auto temp = x;
 	x = y;
 	y = temp;
 
+
+	//Koordynat x poza wymiarami, zwiekszamy rozmiar macierzy aby sie dopasowac
 	if (x > m_DrawMatrix.size() - 1)
 	{
 		auto diff_x = x - m_DrawMatrix.size() + 1;
@@ -273,6 +256,7 @@ void HeapGui::writeToMatrix(HeapNodeId val, unsigned x, unsigned y)
 		}
 	}
 
+	//Koordynat y poza wymiarami, zwiekszamy rozmiar macierzy aby sie dopasowac
 	if (y > m_DrawMatrix[0].size() - 1)
 	{
 		auto diff_y = y - m_DrawMatrix[0].size() + 1;
@@ -285,6 +269,7 @@ void HeapGui::writeToMatrix(HeapNodeId val, unsigned x, unsigned y)
 		}
 	}
 
+	//Bezpiecznie zapisujemy nowa wartosc
 	m_DrawMatrix[x][y] = val;
 }
 
@@ -333,8 +318,10 @@ void HeapGui::registerDLinkParentChild(NodePtr& node)
 
 long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsigned y)
 {
+	//Zapisz dany wezel do macierzy
 	writeToMatrix(node->getNodeNumber(), x, y);
 
+	//Wywolaj rekurencyjnie dla jego ewentualnych dzieci
 	if (node->getDegree() == 0)
 	{
 		return 0L;
@@ -344,80 +331,6 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 		addNodeToDrawMatrix(node->getChild().lock(), m, x, y + 2);
 		return 0L;
 	}
-	/*else if (node->getDegree() == 2)
-	{
-		auto child = node->getChild().lock();
-		auto second_child = child->getPrev().lock();
-
-
-
-		if (child->getDegree() == 1)
-		{
-			registerDLinkParentChild(child);
-			addNodeToDrawMatrix(child, m, x + 2, y + 2);
-		}
-		else if (child->getDegree() == 0)
-		{
-			registerSLinkParentChild(child);
-			addNodeToDrawMatrix(child, m, x, y + 2);
-		}
-		else
-		{
-
-		}
-
-		if (child->getDegree() == 1)
-		{
-			registerDLinkParentChild(child);
-			addNodeToDrawMatrix(child, m, x + 2, y + 2);
-		}
-		if (child->getDegree() == 0)
-		{
-			registerSLinkParentChild(child);
-			addNodeToDrawMatrix(child, m, x, y + 2);
-		}
-
-
-		return 2L;
-	}*/
-	/*else if (node->getDegree() == 3)
-	{
-		auto child = node->getChild().lock();
-
-		if (child->getDegree() == 2)
-		{
-			registerDLinkParentChild(child);
-			addNodeToDrawMatrix(child, m, x + 4, y + 2);
-		}
-		else
-		{
-			throw exception{ "DrawMatrix: Child of degree 3 subheap is not 2-degree!" };
-		}
-
-		child = child->getPrev().lock();
-		if (child->getDegree() == 1)
-		{
-			registerSLinkParentChild(child);
-			addNodeToDrawMatrix(child, m, x + 2, y + 2);
-		}
-		else
-		{
-			throw exception{ "DrawMatrix:Second child of degree 3 subheap is not 1-degree!" };
-		}
-
-		child = child->getPrev().lock();
-		if (child->getDegree() == 0)
-		{
-			registerSLinkParentChild(child);
-			addNodeToDrawMatrix(child, m, x, y + 2);
-		}
-		else
-		{
-			throw exception{ "DrawMatrix:Third child of degree 3 subheap is not 0-degree!" };
-		}
-
-		return 4L;
-	}*/
 	else
 	{
 		y = y + 2;
@@ -430,6 +343,7 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 
 		registerDLinkParentChild(first_child);
 
+		//Pobierz wszystkie dzieci, zarejestruj lacza
 		auto current = last_child;
 		do
 		{
@@ -439,6 +353,7 @@ long HeapGui::addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsig
 			current = current->getNext().lock();
 		} while (current != first_child);
 
+		//Dla kazdego z dzieci wywolaj metode rekurencyjnie, dostrajajac wspolzedne
 		for (auto& child : children)
 		{
 			val = addNodeToDrawMatrix(child, m, x, y) ;
@@ -468,8 +383,7 @@ void HeapGui::drawHeap()
 	auto current = min;
 	vector<NodePtr> nodes;
 
-	verifyNodeDoubleLinkedList(min);
-
+	//pobierz wszystkie wezly z cyklicznej listy korzeni
 	do
 	{
 		nodes.push_back(current);
@@ -480,8 +394,10 @@ void HeapGui::drawHeap()
 	unsigned y = 0;
 	long w = 0;
 
+	//Czysc macierz rysowania
 	clearMatrix();
 
+	//Dla kazdego wezla na liscie korzeni wywouj rekurencyjnie addNodeToDrawMatrix
 	for (auto& node : nodes)
 	{
 		w = addNodeToDrawMatrix(node, m_DrawMatrix, x, y);
@@ -495,6 +411,7 @@ void HeapGui::drawHeap()
 		}
 	}
 
+	//Narysuj wezly kopca korzystajac z macierzy rysowania, skorzystaj z HeapNodeGui
 	HeapNodeGui node_gui{m_TileSize, m_Font};
 	node_gui.setPosition(Vector2f(0, 0));
 
@@ -502,18 +419,22 @@ void HeapGui::drawHeap()
 	{
 		for (unsigned j = 0; j < m_DrawMatrix[i].size(); ++j)
 		{
+			//Ustaw pozycje
 			auto current_position = Vector2f(j * m_TileSize.x, i * m_TileSize.y);
 			node_gui.setPosition(current_position);
-			//tile.setPosition(current_position);
+
+			//Jesli dana pozycja w macierzy rysowania nie jest "pusta"
 			if (m_DrawMatrix[i][j] != m_EmptyTile)
 			{
 				auto node_ptr = m_Heap.find(m_DrawMatrix[i][j]);
 				node_gui.setNode(node_ptr);
 
+				//Narysuj dany wezel
 				node_gui.draw(m_Window, m_Heap);
 			}
 			else
 			{
+				//Narysuj "puste" pole
 				RectangleShape tile{};
 				tile.setFillColor(Color::Cyan);
 				tile.setSize(Vector2f(m_TileSize.x, m_TileSize.y));

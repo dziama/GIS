@@ -1,9 +1,12 @@
 #pragma once
 #include "Interfaces.h"
 
+//Klasa wezla kopca fibbonaciego
 class HeapNode : public IHeapNode
 {
 public:
+
+	//Funkcje interfejsowe...
 	virtual HeapNodePtr getParent() override;
 	virtual void setParent(HeapNodePtr ptr) override;
 
@@ -11,7 +14,6 @@ public:
 	virtual void setChild(HeapNodePtr ptr) override;
 
 	virtual NodeDegree getDegree() override;
-	//virtual void setDegree(NodeDegree degree) override;
 	virtual void increaseDegree() override;
 	virtual void decreaseDegree() override;
 
@@ -35,24 +37,30 @@ public:
 
 	virtual EdgeWeight getPriority();
 
-	//HeapNode(VertexPtr ptr, EdgeWeight priority, HeapNodePtr next, HeapNodePtr prev);
+	//Konstruktory
 	HeapNode(VertexPtr vert, HeapNodeId num);
 	HeapNode(VertexPtr vert, HeapNodeId num, EdgeWeight initWeight);
 
 private:
 
+	//Wskazniki na: rodzica, dziecko o najwyrzszym stopniu, wezel nastepny i poprzedni
 	HeapNodePtr m_Parent;
 	HeapNodePtr m_Child;
 	HeapNodePtr m_Next;
 	HeapNodePtr m_Prev;
 
+	//Przechowywany wskaznik na wierzcholek
 	VertexPtr m_Vertex;
 
+	//Numer wezla
 	HeapNodeId m_NodeNumber;
 
+	//Oznaczenie
 	bool m_Marked;
 
+	//Stopien
 	NodeDegree m_Degree;
 
+	//Priorytet/Waga krawedzi (im nizsza wartosc, tym wyrzszy priorytet)
 	EdgeWeight m_Weight;
 };

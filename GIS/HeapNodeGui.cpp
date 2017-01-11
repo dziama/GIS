@@ -11,10 +11,6 @@ HeapNodeGui::HeapNodeGui(Vector2u tileSize, Font& font)
 	m_TileSize = tileSize;
 }
 
-HeapNodeGui::~HeapNodeGui()
-{
-}
-
 void HeapNodeGui::setNode(NodePtr ptr)
 {
 	m_NodePtr = ptr;
@@ -36,6 +32,7 @@ void HeapNodeGui::draw(RenderWindow& window, FibonacciHeap& heap)
 		m_NodeSprite.setFillColor(m_Default);
 	}
 
+	//Narysuj okrag, baze wezla
 	window.draw(m_NodeSprite);
 
 	auto node = m_NodePtr.lock();
@@ -44,7 +41,8 @@ void HeapNodeGui::draw(RenderWindow& window, FibonacciHeap& heap)
 	string priority;
 	EdgeWeight weight = node->getPriority();
 
-	if (weight > 100L)
+	//Jesli nasz priorytet jest dosc duzy...
+	if (weight > 1000L)
 	{
 		ss << "INF";
 	}
@@ -53,13 +51,16 @@ void HeapNodeGui::draw(RenderWindow& window, FibonacciHeap& heap)
 		ss << weight;
 	}
 	
+	//Konwertuj numer liczbowo na znaki typu char w string
 	ss >> priority;
 
+	//Ustaw parametry wartosci priorytetu (graficzne)
 	m_PriorityText.setFont(m_Font);
 	m_PriorityText.setString(priority);
-	m_PriorityText.setCharacterSize(m_TileSize.x / 2);
+	m_PriorityText.setCharacterSize(m_TileSize.x / 3);
 	m_PriorityText.setFillColor(sf::Color::Black);
 	m_PriorityText.setPosition(m_Position);
 
+	//Narysuj priorytet na okregu wezla
 	window.draw(m_PriorityText);
 }

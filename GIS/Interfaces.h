@@ -1,4 +1,6 @@
 #pragma once
+//Deklaracje using, specyfikacje klas interfejsowych, skroty, typedefy i biblioteki standardowe C++...
+
 #include <memory>
 #include <vector>
 #include <map>
@@ -52,7 +54,6 @@ typedef weak_ptr<IVertex> VertexPtr;
 typedef unique_ptr<IGraph> GraphPtr;
 typedef weak_ptr<IEdge> EdgePtr;
 
-
 typedef shared_ptr<IVertex> GraphVertexPtr;
 typedef shared_ptr<IEdge> GraphEdgePtr;
 typedef map<VertexId, GraphVertexPtr> Vertices;
@@ -70,17 +71,14 @@ public:
 	virtual VertexId getId() = 0;
 	virtual void addEdge(EdgePtr ptr) = 0;
 	virtual vector<EdgeId> getEdges() = 0;
-	//virtual void deleteEdge(EdgeId edgeId) = 0;
 };
 
 class IEdge
 {
 public:
 	virtual EdgeId getId() = 0;
-	//virtual void setId(EdgeId id) = 0;
 
 	virtual EdgeWeight getWeight() = 0;
-	//virtual void setWeight(EdgeWeight priority) = 0;
 
 	virtual void setFirstVertex(VertexPtr ptr) = 0;
 	virtual void setSecondVertex(VertexPtr ptr) = 0;
@@ -98,7 +96,6 @@ public:
 	virtual void setChild(HeapNodePtr ptr) = 0;
 
 	virtual NodeDegree getDegree() = 0;
-	//virtual void setDegree(NodeDegree degree) = 0;
 	virtual void increaseDegree() = 0;
 	virtual void decreaseDegree() = 0;
 
@@ -116,8 +113,6 @@ public:
 	virtual bool hasChild() = 0;
 	virtual bool hasParent() = 0;
 
-	
-
 	virtual HeapNodeId getNodeNumber() = 0;
 
 	virtual EdgeWeight getPriority() = 0;
@@ -132,8 +127,6 @@ public:
 
 	virtual VertexPtr getVertex(VertexId vertexId) = 0;
 	virtual EdgePtr getEdge(EdgeId edgeId) = 0;
-
-	virtual void getMinimumSpanningTree(GraphPtr& ptr) = 0;
 
 	virtual void printEdges(ostream& stream) = 0;
 	virtual void printVertices(ostream& stream) = 0;

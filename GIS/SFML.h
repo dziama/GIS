@@ -1,4 +1,5 @@
 #pragma once
+//Wspolne elementy dla klas graficznych
 
 #include "Interfaces.h"
 

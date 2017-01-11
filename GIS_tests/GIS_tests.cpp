@@ -8,6 +8,7 @@ string TEST_FILES_PATH = "E:\\";
 
 BOOST_AUTO_TEST_CASE(INSERTING_INTO_ROOT_LIST_TEST)
 {
+	std::cout << "__________________INSERTING_INTO_ROOT_LIST_TEST_________________" << endl;
 	ifstream graph_ifstream;
 	string graph_file = TEST_FILES_PATH + "Graf.txt";
 
@@ -79,6 +80,7 @@ BOOST_AUTO_TEST_CASE(MOVE_NODE_CHILDREN_TEST)
 
 BOOST_AUTO_TEST_CASE(BUILD_AND_EMPTY_SMALLHEAP)
 {
+	std::cout << "__________________BUILD_AND_EMPTY_SMALLHEAP_TEST_________________" << endl;
 	Graph graph{};
 	FibonacciHeap heap{};
 	vector<VertexId> vertex_ids{};
@@ -122,55 +124,9 @@ BOOST_AUTO_TEST_CASE(BUILD_AND_EMPTY_SMALLHEAP)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(LARGE_SEQUENCE_TEST)
-{
-	/*ifstream seq_ifstream;
-	string seq_file = TEST_FILES_PATH + "Test_Seq.txt";
-
-	seq_ifstream.open(seq_file.c_str());
-
-	Graph graph{};
-	FibonacciHeap test_heap{};
-	vector<GraphEdgePtr> edges{};
-
-	if (seq_ifstream.is_open())
-	{
-		string line;
-		stringstream ss;
-		getline(seq_ifstream, line);
-
-		ss << line;
-		EdgeWeight weight;
-		EdgeId edge_id = 0;
-		unsigned edge_itr = 0;
-		do
-		{
-			ss >> weight;
-			auto id =graph.addVertex();
-			edges.push_back(GraphEdgePtr{ new Edge{edge_id++, weight} });
-			test_heap.insert(graph.getVertex(id), edges[edge_itr]);
-			++edge_itr;
-		} while (ss.eof() == false);
-
-		EdgeWeight i = 1;
-		while (test_heap.isEmpty() == false)
-		{
-			auto min = test_heap.extractMin();
-			if (i != min->getPriority())
-			{
-				throw exception{ "Sequence invalid!" };
-			}
-			++i;
-		}
-	}
-	else
-	{
-		throw exception{ "Sequence file not found!" };
-	}*/
-}
-
 BOOST_AUTO_TEST_CASE(THIRD_DEGREE_SUBHEAP_TEST)
 {
+	std::cout << "__________________THIRD_DEGREE_SUBHEAP_TEST_________________" << endl;
 	Graph graph{};
 	FibonacciHeap heap{};
 	vector<VertexId> vertex_ids{};
@@ -242,10 +198,12 @@ BOOST_AUTO_TEST_CASE(THIRD_DEGREE_SUBHEAP_TEST)
 
 BOOST_AUTO_TEST_CASE(CUT_TEST)
 {
-
+	FibbonacciHeapTestClass test;
+	test.testCut();
 }
 
-BOOST_AUTO_TEST_CASE(CASCADE_CUT_TEST)
+BOOST_AUTO_TEST_CASE(DECREASE_KEY_TEST)
 {
-
+	FibbonacciHeapTestClass test;
+	test.testDecreaseKey();
 }

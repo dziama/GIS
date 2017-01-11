@@ -10,7 +10,7 @@ HeapNode::HeapNode(VertexPtr vert, HeapNodeId num) :
 	}
 
 	m_Vertex = vert;
-	m_Weight = std::numeric_limits<EdgeWeight>::max();
+	m_Weight = std::numeric_limits<EdgeWeight>::max(); //Domyslna wartosc to nieskonczonosc (max dla long)
 }
 
 HeapNode::HeapNode(VertexPtr vert, HeapNodeId num, EdgeWeight initWeight) : 
@@ -57,11 +57,6 @@ void HeapNode::setPriority(EdgeWeight weight)
  {
 	 return m_Degree;
  }
- 
- //void HeapNode::setDegree(NodeDegree degree)
- //{
-//	 m_Degree = degree;
- //}
 
  void HeapNode::increaseDegree()
  {

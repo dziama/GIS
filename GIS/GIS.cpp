@@ -13,46 +13,16 @@ namespace fs = boost::filesystem;
 
 typedef po::options_description ProgramOptions;
 
+//argumenty wywolania
 string option_help = "help";
 string option_graph_file = "gfile";
 string option_coords_file = "cfile";
-
-void testRootList(GraphPtr& graph)
-{
-	//FibonacciHeap heap{};
-
-	//auto& vertices = graph->getVertices();
-
-	//double fake_weight = 256;
-	//for (auto& vert : vertices)
-	//{
-	//	(fake_weight > 512) ? fake_weight -= 128 : fake_weight += 196;
-	//	heap.insert(vert.second, (long)fake_weight);
-	//	heap.printNodeList(std::cout, heap.peekMinElement());
-	//	std::cout << "---------------------------------------------------" << endl;
-	//}
-
-	//std::cout << "-----------------END-------------------------------" << endl;
-	////heap.printRootList(std::cout);
-	////std::cout << "---------------------------------------------------" << endl;
-
-	//auto vert_ptr = heap.extractMin();
-	//heap.printNodeList(std::cout, heap.peekMinElement());
-	//vert_ptr = heap.extractMin();
-	//heap.printNodeList(std::cout, heap.peekMinElement());
-	//vert_ptr = heap.extractMin();
-	//heap.printNodeList(std::cout, heap.peekMinElement());
-	//vert_ptr = heap.extractMin();
-	//heap.printNodeList(std::cout, heap.peekMinElement());
-	//vert_ptr = heap.extractMin();
-	//std::cout << "-----------------EMPTY HEAP-------------------------------" << endl;
-	//heap.printNodeList(std::cout, heap.peekMinElement());
-}
 
 int main(int argc, char* argv[])
 {
 	try
 	{
+		//Obsluga argumentow wywolania
 		ProgramOptions options("Program arguments");
 		options.add_options()
 			(option_help.c_str(), "Help message")
@@ -89,9 +59,12 @@ int main(int argc, char* argv[])
 			return 2;
 		}
 
+		//Wczytanie czcionki
 		string font_path = "E:/FUTRFW.TTF";
 		Font font;
 		bool result = font.loadFromFile(font_path);
+
+		//Odczyt maciezy wag grafu
 		ifstream graph_ifstream;
 
 		graph_ifstream.open(graph_file.c_str());
@@ -135,6 +108,7 @@ int main(int argc, char* argv[])
 				}
 			}
 
+			//Inicjalizacja i uruchomienie GUI
 			HeapGui gui{ heap, graph, font };
 			gui.showGui();
 		}

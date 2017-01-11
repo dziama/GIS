@@ -12,5 +12,7 @@ public:
 	void testHeapLink();
 	void testExtractMin();
 	void testMoveNodeChildren();
+	void testCut();
+	void testDecreaseKey();
 };
 

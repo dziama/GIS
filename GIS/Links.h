@@ -1,6 +1,8 @@
 #pragma once
 #include "Interfaces.h"
 
+//Struktury reprezetujace powiazania miedzy wezlami, do celow graficznych
+
 struct DLinkParentChild
 {
 	HeapNodePtr parent;

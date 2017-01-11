@@ -23,10 +23,13 @@ VertexId Graph::addVertex()
 EdgeId Graph::addEdge(VertexId vertexId1, VertexId vertexId2, EdgeWeight weight)
 {
 	bool edge_exists = false;
+
+	//Sprawdz czy podane id wierzcholkow rzeczywiscie istnieja...
 	if (m_Vertices.count(vertexId1) == 1 && m_Vertices.count(vertexId2) == 1)
 	{
 		auto edges_ids = m_Vertices[vertexId1]->getEdges();
 		
+		//Sprawdz czy krawedz miedzy dwoma wierzcholkami przypadkiem juz nie istnieje...
 		for (auto& id : edges_ids)
 		{
 			if (m_Edges.count(id) == 1)
@@ -57,11 +60,11 @@ EdgeId Graph::addEdge(VertexId vertexId1, VertexId vertexId2, EdgeWeight weight)
 
 		if (edge_exists)
 		{
-			return -1;
-			//throw exe? trying to add existing edge?
+			throw exception{ "Edge already exists!" };
 		}
 		else
 		{
+			//Dodaj nowa krawedz i ustaw jej dane
 			EdgeId id = m_NextEdgeId++;
 			GraphEdgePtr ptr(new Edge(id, weight));
 			ptr->setFirstVertex(VertexPtr(m_Vertices[vertexId1]));
@@ -74,7 +77,7 @@ EdgeId Graph::addEdge(VertexId vertexId1, VertexId vertexId2, EdgeWeight weight)
 	}
 	else
 	{
-		return -1;
+		throw exception{ "At least one given vertice does not exists when trying to add new edge!" };
 	}
 }
 
@@ -101,11 +104,6 @@ EdgePtr Graph::getEdge(EdgeId edgeId)
 	{
 		throw exception{ "Requested edgeID not found in Graph!" };
 	}
-}
-
-void Graph::getMinimumSpanningTree(GraphPtr& ptr)
-{
-
 }
 
 void Graph::printEdges(ostream& stream)
