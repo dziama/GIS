@@ -27,11 +27,11 @@ public:
 	void decreaseKey(VertexPtr ptr, EdgeWeight weight);
 
 	//Wypisywanie danych wezlow na danym poziomie np. lista korzeni lub lista dzieci jakiegos wezla...
-	void printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose = false);
-	void printNode(ostream& stream, HeapNodePtr& ptr);
+	void printNodeList(ostream& stream, const HeapNodePtr& ptr, bool verbose = false);
+	void printNode(ostream& stream, const HeapNodePtr& ptr);
 
 	//Podejrzenie jaki jest obecny minimalny element
-	HeapNodePtr peekMinElement();  
+	HeapNodePtr peekMinElement();
 
 	//Tlumaczyc nie trzeba...
 	bool isEmpty();

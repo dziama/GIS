@@ -59,19 +59,19 @@ private:
 	//Zapis i czyszczenie macierzy rysowania
 	void writeToMatrix(HeapNodeId val, unsigned x, unsigned y);
 	void clearMatrix();
-	
+
 	//Rekurencyjna funkcja dodajaca wezly do macierzy rysowania
 	long addNodeToDrawMatrix(NodePtr node, DrawMatrix& m, unsigned x, unsigned y);
 
 	//Rejestracja polaczen miedzy wezlami
-	void registerDLinkSiblings(NodePtr& first, NodePtr& second);
-	void registerSLinkParentChild(NodePtr& node);
-	void registerDLinkParentChild(NodePtr& node);
+	void registerDLinkSiblings(const NodePtr& first, const NodePtr& second);
+	void registerSLinkParentChild(const NodePtr& node);
+	void registerDLinkParentChild(const NodePtr& node);
 
 	//Pomocnicza funkcja do okreslania przesuniecia miedzy rysowanymi wezlami
 	long xOffset(unsigned x);
 
-	//Zwraca wspolzedne centralnego punktu okna
+	//Zwraca wspolrzedne centralnego punktu okna
 	Vector2u getWindowCenter();
 
 	//Reakcja na zdarzenia przyciskow klawiatury

@@ -36,7 +36,7 @@ void FibonacciHeap::cut(NodePtr child, NodePtr parent)
 		else
 		{
 			parent->setChild(child_prev);
-			//throw exception{ "Cut: Error setting new child node of parent when cutting one of its children!" };
+			//throw runtime_error{ "Cut: Error setting new child node of parent when cutting one of its children!" };
 		}
 	}
 
@@ -110,7 +110,7 @@ void FibonacciHeap::decreaseKey(VertexPtr ptr, EdgeWeight weight)
 	//Nie chcemy powiekszyc wartosci..., chcemy ja zmniejszyc
 	if (node->getPriority() < weight)
 	{
-		throw exception{ "Edge to be changed has higher weight than previous!" };
+		throw runtime_error{ "Edge to be changed has higher weight than previous!" };
 	}
 
 	//Zmieniamy priorytet
@@ -136,7 +136,7 @@ HeapNodeId FibonacciHeap::insert(VertexPtr ptr, EdgeWeight weight)
 	//Postych wskaznikow na wezel nie chcemy
 	if (ptr.lock() == nullptr)
 	{
-		throw exception{ "FibbonacciHeap: VertexPtr passed as nullptr!" };
+		throw runtime_error{ "FibbonacciHeap: VertexPtr passed as nullptr!" };
 	}
 
 	HeapNodeId id = m_NextFreeNodeNumber++;
@@ -284,7 +284,7 @@ void FibonacciHeap::consolidate(NodePtr begin)
 	NodeDegree degree = 0;
 
 	//Dynamiczne zwiekszanie pomocniczej tabeli, ochrona przed wyjsciem poza indeks
-	auto& auxTableSentry = [&aux_table](NodeDegree d) -> bool
+	auto auxTableSentry = [&aux_table](NodeDegree d) -> bool
 	{
 		if (aux_table.size() == 0)
 		{
@@ -333,13 +333,13 @@ void FibonacciHeap::consolidate(NodePtr begin)
 				visted_node.swap(y);
 			}
 
-			//Laaczymy wezly, y staje sie dzieckiem visted_node
+			//Laczymy wezly, y staje sie dzieckiem visted_node
 			heapLink(y, visted_node);
 			
 			//Polaczylismy np. dwa wezly stopnia 0 w wezel stopnia 1, w tablicy zwalniamy indeks 0
 			aux_table[degree] = nullptr;
 
-			//teraz zajmujemy sie stopniem wyrzszym
+			//teraz zajmujemy sie stopniem wyzszym
 			++degree;
 
 			//Upewniamy sie ze nasza tablica jest odpowiednio duza...
@@ -393,7 +393,7 @@ void FibonacciHeap::insertIntoRootList(NodePtr& node)
 		//nowy element minimalny
 		if (node->getPriority() < min_element->getPriority())
 		{
-			m_MinElement = node; 
+			m_MinElement = node;
 		}
 	}
 	else
@@ -412,7 +412,7 @@ NodePtr FibonacciHeap::moveNodeChildrenToRootList(NodePtr& node)
 	//Nie powinien miec rodzica...
 	if (node->hasParent())
 	{
-		throw exception{ "Node to be extracted cannot have parent!" };
+		throw runtime_error{ "Node to be extracted cannot have parent!" };
 	}
 
 	//Jesli ma dzieci, sprawa sie ciut komplikuje
@@ -420,7 +420,7 @@ NodePtr FibonacciHeap::moveNodeChildrenToRootList(NodePtr& node)
 	{
 		if (node->getDegree() == 1)
 		{
-			//Jelsi jest tylko jedno dziecko, dodajemy je do listy korzeni kopca
+			//Jesli jest tylko jedno dziecko, dodajemy je do listy korzeni kopca
 			NodePtr child = node->getChild().lock();
 
 			child->setParent(HeapNodePtr{});
@@ -479,7 +479,7 @@ NodePtr FibonacciHeap::removeMinFromRootList()
 	return min_ptr;
 } 
 
-void FibonacciHeap::printNodeList(ostream& stream, HeapNodePtr& ptr, bool verbose)
+void FibonacciHeap::printNodeList(ostream& stream, const HeapNodePtr& ptr, bool verbose)
 {
 	//Drukowanie list cyklicznych, listy korzeni kopca... listy dzieci...
 	//Proste (tylko w przod)
@@ -535,7 +535,7 @@ HeapNodePtr FibonacciHeap::peekMinElement()
 	return m_MinElement;
 }
 
-void FibonacciHeap::printNode(ostream& stream, HeapNodePtr& ptr)
+void FibonacciHeap::printNode(ostream& stream, const HeapNodePtr& ptr)
 {
 	auto node = ptr.lock();
 

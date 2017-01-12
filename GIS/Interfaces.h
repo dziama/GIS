@@ -31,6 +31,7 @@ using std::exception;
 using std::stringstream;
 using std::ifstream;
 using std::getline;
+using std::runtime_error;
 
 using namespace std::chrono_literals;
 

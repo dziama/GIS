@@ -6,7 +6,7 @@ HeapNode::HeapNode(VertexPtr vert, HeapNodeId num) :
 {
 	if (vert.lock() == nullptr)
 	{
-		throw exception{ "Heap node cannot contain nullptr to Vertex!" };
+		throw runtime_error{ "Heap node cannot contain nullptr to Vertex!" };
 	}
 
 	m_Vertex = vert;
@@ -29,7 +29,7 @@ void HeapNode::setPriority(EdgeWeight weight)
 	}
 	else
 	{
-		throw exception{ "HeapNode: Tried to change weight to higher!" };
+		throw runtime_error{ "HeapNode: Tried to change weight to higher!" };
 	}
 }
 

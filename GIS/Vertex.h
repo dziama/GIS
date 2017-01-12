@@ -22,4 +22,3 @@ private:
 	//Wskazniki na krawedzie sasiadujace z wierzcholkiem
 	vector<EdgePtr> m_Edges;
 };
-

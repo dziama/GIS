@@ -58,7 +58,7 @@ void HeapGui::showGui()
 	//Wierzcholek 'u'
 	VertexPtr u;
 
-	//Stworz zbior wierzcholkow: wierzcholek : rodzic, zainicjalizuj rodziców jako pustych
+	//Stworz zbior wierzcholkow: wierzcholek : rodzic, zainicjalizuj rodzicï¿½w jako pustych
 	for (auto& vertex : vertices)
 	{
 		vertex_vertex_parent.push_back(VertexPair(vertex.second, VertexPtr{}));
@@ -90,7 +90,7 @@ void HeapGui::showGui()
 				return second;
 			}
 		}
-		throw exception{ "getParent lambda: Parent not found!" };
+		throw runtime_error{ "getParent lambda: Parent not found!" };
 	};
 
 	//Funkcja Lambda, ustawia rodzica wierzcholka
@@ -273,7 +273,7 @@ void HeapGui::writeToMatrix(HeapNodeId val, unsigned x, unsigned y)
 	m_DrawMatrix[x][y] = val;
 }
 
-void HeapGui::registerDLinkSiblings(NodePtr& first, NodePtr& second)
+void HeapGui::registerDLinkSiblings(const NodePtr& first, const NodePtr& second)
 {
 	DLinkSiblings link{};
 	if (first->getNext().lock() == second && second->getPrev().lock() == first)
@@ -294,7 +294,7 @@ void HeapGui::registerDLinkSiblings(NodePtr& first, NodePtr& second)
 	}
 }
 
-void HeapGui::registerSLinkParentChild(NodePtr& node)
+void HeapGui::registerSLinkParentChild(const NodePtr& node)
 {
 	if (node->getParent().lock() != nullptr)
 	{
@@ -305,7 +305,7 @@ void HeapGui::registerSLinkParentChild(NodePtr& node)
 	}
 }
 
-void HeapGui::registerDLinkParentChild(NodePtr& node)
+void HeapGui::registerDLinkParentChild(const NodePtr& node)
 {
 	if (node->getParent().lock() != nullptr)
 	{

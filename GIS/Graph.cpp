@@ -60,7 +60,7 @@ EdgeId Graph::addEdge(VertexId vertexId1, VertexId vertexId2, EdgeWeight weight)
 
 		if (edge_exists)
 		{
-			throw exception{ "Edge already exists!" };
+			throw runtime_error{ "Edge already exists!" };
 		}
 		else
 		{
@@ -77,7 +77,7 @@ EdgeId Graph::addEdge(VertexId vertexId1, VertexId vertexId2, EdgeWeight weight)
 	}
 	else
 	{
-		throw exception{ "At least one given vertice does not exists when trying to add new edge!" };
+		throw runtime_error{ "At least one given vertice does not exists when trying to add new edge!" };
 	}
 }
 
@@ -89,7 +89,7 @@ VertexPtr Graph::getVertex(VertexId vertexId)
 	}
 	else
 	{
-		throw exception{ "Requested vertexID not found in Graph!" };
+		throw runtime_error{ "Requested vertexID not found in Graph!" };
 	}
 	
 }
@@ -102,7 +102,7 @@ EdgePtr Graph::getEdge(EdgeId edgeId)
 	}
 	else
 	{
-		throw exception{ "Requested edgeID not found in Graph!" };
+		throw runtime_error{ "Requested edgeID not found in Graph!" };
 	}
 }
 

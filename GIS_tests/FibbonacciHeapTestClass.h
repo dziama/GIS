@@ -1,7 +1,7 @@
 #pragma once
-#include "GIS\Graph.h"
-#include "GIS\FibonacciHeap.h"
-#include "GIS\Utility.h"
+#include "GIS/Graph.h"
+#include "GIS/FibonacciHeap.h"
+#include "GIS/Utility.h"
 
 class FibbonacciHeapTestClass
 {

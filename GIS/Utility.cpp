@@ -31,7 +31,7 @@ void readMatrix(ifstream& file, Matrix& mat)
 	}
 }
 
-void verifyNodePointer(NodePtr& listNode)
+void verifyNodePointer(const NodePtr& listNode)
 {
 	if (listNode)
 	{
@@ -40,12 +40,12 @@ void verifyNodePointer(NodePtr& listNode)
 
 		if (next == nullptr)
 		{
-			throw exception{ "Given listNode pointer has invalid next node pointer: nullptr!" };
+			throw runtime_error{ "Given listNode pointer has invalid next node pointer: nullptr!" };
 		}
 
 		if (prev == nullptr)
 		{
-			throw exception{ "Given listNode pointer has invalid previous node pointer: nullptr!" };
+			throw runtime_error{ "Given listNode pointer has invalid previous node pointer: nullptr!" };
 		}
 
 		if (next == listNode)
@@ -55,7 +55,7 @@ void verifyNodePointer(NodePtr& listNode)
 				stringstream errstr;
 				errstr << "Invalid listNode pointer linking! NextPtr points to the same node while PrevPtr points somwhere else! NodePriority:";
 				errstr << listNode->getPriority() << " Node number: " << listNode->getNodeNumber();
-				throw exception{ errstr.str().c_str() };
+				throw runtime_error{ errstr.str().c_str() };
 			}
 		}
 
@@ -66,17 +66,17 @@ void verifyNodePointer(NodePtr& listNode)
 				stringstream errstr;
 				errstr << "Invalid listNode pointer linking! NextPtr points to the same node while PrevPtr points somwhere else! NodePriority:";
 				errstr << listNode->getPriority() << " Node number: " << listNode->getNodeNumber();
-				throw exception{ errstr.str().c_str() };
+				throw runtime_error{ errstr.str().c_str() };
 			}
 		}
 	}
 	else
 	{
-		throw exception{ "Pointer to list node is nullptr!" };
+		throw runtime_error{ "Pointer to list node is nullptr!" };
 	}
 }
 
-void verifyNodeDoubleLinkedList(NodePtr& listNode)
+void verifyNodeDoubleLinkedList(const NodePtr& listNode)
 {
 	verifyNodePointer(listNode);
 

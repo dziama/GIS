@@ -34,3 +34,9 @@
 .sln
 .filters
 .vcxproj
+
+# CMake cache
+cmake-build-debug
+
+# CLion stuff
+.idea

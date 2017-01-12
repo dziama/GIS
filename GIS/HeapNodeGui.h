@@ -19,7 +19,7 @@ public:
 	void setPosition(Vector2f pos);
 
 private:
-	
+
 	//Numer wezla
 	Text m_NodeNumberSprite;
 

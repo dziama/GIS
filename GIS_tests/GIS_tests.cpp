@@ -2,7 +2,7 @@
 //
 #include "FibbonacciHeapTestClass.h"
 #define BOOST_TEST_MODULE GIS_TESTS
-#include <boost\test\included\unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 string TEST_FILES_PATH = "E:\\";
 
@@ -45,8 +45,8 @@ BOOST_AUTO_TEST_CASE(INSERTING_INTO_ROOT_LIST_TEST)
 			}
 		}
 
-		auto& vertices = graph.getVertices();
-		auto& edges = graph.getEdges();
+		auto vertices = graph.getVertices();
+		auto edges = graph.getEdges();
 
 		for (unsigned i = 0; i < vertices.size(); ++i)
 		{
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(INSERTING_INTO_ROOT_LIST_TEST)
 	}
 	else
 	{
-		throw exception{ "Test graph file not found!" };
+		throw runtime_error{ "Test graph file not found!" };
 	}
 }
 
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(BUILD_AND_EMPTY_SMALLHEAP)
 		auto min = heap.extractMin();
 		if (min->getPriority() != correct_sequence[itr])
 		{
-			throw exception{ "Invalid priority node extracted!" };
+			throw runtime_error{ "Invalid priority node extracted!" };
 		}
 		itr++;
 	}

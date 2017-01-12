@@ -36,7 +36,7 @@ void FibbonacciHeapTestClass::testExtractMin()
 	auto min = heap.extractMin();
 	if (min->getPriority() != 1)
 	{
-		throw exception{ "Heap returned wrong min element!" };
+		throw runtime_error{ "Heap returned wrong min element!" };
 	}
 
 	verifyNodePointer(min);
@@ -68,12 +68,12 @@ void FibbonacciHeapTestClass::testExtractMin()
 	verifyNodePointer(min);
 	if (min->getDegree() != 0)
 	{
-		throw exception{ "Heap returned wrong min element with wrong degree!" };
+		throw runtime_error{ "Heap returned wrong min element with wrong degree!" };
 	}
 
 	if (min->getPriority() != 10)
 	{
-		throw exception{ "Heap returned wrong min element!" };
+		throw runtime_error{ "Heap returned wrong min element!" };
 	}
 
 	verifyNodeDoubleLinkedList(heap.peekMinElement().lock());
@@ -90,7 +90,7 @@ void FibbonacciHeapTestClass::testExtractMin()
 
 	if (heap.peekMinElement().lock()->getPriority() != 15)
 	{
-		throw exception{ "Heap points to wrong min element!" };
+		throw runtime_error{ "Heap points to wrong min element!" };
 	}
 }
 
@@ -122,7 +122,7 @@ void FibbonacciHeapTestClass::testHeapLink()
 	auto min = heap.peekMinElement().lock();
 	if (min->getPriority() != 1)
 	{
-		throw exception{ "Heap returned wrong priority min element!" };
+		throw runtime_error{ "Heap returned wrong priority min element!" };
 	}
 
 	verifyNodePointer(min);
@@ -149,22 +149,22 @@ void FibbonacciHeapTestClass::testHeapLink()
 
 	if (parent->hasChild() != true)
 	{
-		throw exception{ "Parent says he has no children!" };
+		throw runtime_error{ "Parent says he has no children!" };
 	}
 
 	if (child->hasParent() != true)
 	{
-		throw exception{ "Child says he has no parent!" };
+		throw runtime_error{ "Child says he has no parent!" };
 	}
 
 	if (parent->getDegree() != 1)
 	{
-		throw exception{ "Wrong parent degree!" };
+		throw runtime_error{ "Wrong parent degree!" };
 	}
 
 	if (child->getDegree() != 0)
 	{
-		throw exception{ "Wrong child degree!" };
+		throw runtime_error{ "Wrong child degree!" };
 	}
 
 	auto second_child = heap.m_HeapNodes[heap_node_ids[0]];
@@ -185,17 +185,17 @@ void FibbonacciHeapTestClass::testHeapLink()
 
 	if (parent->hasChild() != true)
 	{
-		throw exception{ "Parent says he has no children!" };
+		throw runtime_error{ "Parent says he has no children!" };
 	}
 
 	if (child->hasParent() != true)
 	{
-		throw exception{ "Child says he has no parent!" };
+		throw runtime_error{ "Child says he has no parent!" };
 	}
 
 	if (parent->getDegree() != 2)
 	{
-		throw exception{ "Wrong parent degree!" };
+		throw runtime_error{ "Wrong parent degree!" };
 	}
 }
 
@@ -264,7 +264,7 @@ void FibbonacciHeapTestClass::testMoveNodeChildren()
 	auto min = heap.peekMinElement().lock();
 	if (min->getPriority() != 5)
 	{
-		throw exception{ "Heap returned wrong priority min element!" };
+		throw runtime_error{ "Heap returned wrong priority min element!" };
 	}
 
 	std::cout << "Should be 5 15 12 6" << endl;
@@ -321,12 +321,12 @@ void FibbonacciHeapTestClass::testCut()
 
 	if (parent->getPriority() != 10)
 	{
-		throw exception{ "Heap returned wrong priority element!" };
+		throw runtime_error{ "Heap returned wrong priority element!" };
 	}
 
 	if (child->getPriority() != 13)
 	{
-		throw exception{ "Heap returned wrong priority element!" };
+		throw runtime_error{ "Heap returned wrong priority element!" };
 	}
 
 	heap.cut(child, parent);
@@ -383,7 +383,7 @@ void FibbonacciHeapTestClass::testDecreaseKey()
 	auto node = heap.find(vertex);
 	if (node->getPriority() != 15)
 	{
-		throw exception{ "Found wrong element!" };
+		throw runtime_error{ "Found wrong element!" };
 	}
 
 	heap.decreaseKey(vertex, 7); //Decrease Node with weight 15 down to 7;
@@ -396,7 +396,7 @@ void FibbonacciHeapTestClass::testDecreaseKey()
 	node = heap.find(vertex);
 	if (node->getPriority() != 10)
 	{
-		throw exception{ "Found wrong element!" };
+		throw runtime_error{ "Found wrong element!" };
 	}
 
 	heap.decreaseKey(vertex, 5);

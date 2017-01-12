@@ -3,8 +3,8 @@
 
 #include "Interfaces.h"
 
-#include <SFML\Window.hpp>
-#include <SFML\Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 using sf::Text;
 using sf::Window;

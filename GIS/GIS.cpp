@@ -5,8 +5,8 @@
 #include "HeapGui.h"
 #include "SFML.h"
 
-#include <boost\program_options.hpp>
-#include <boost\filesystem.hpp>
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
